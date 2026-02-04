@@ -1,4 +1,10 @@
 ﻿using AccessoriesShop.Application;
+using AccessoriesShop.Application.IAuthentication;
+using AccessoriesShop.Application.IRepositories;
+using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Services;
+using AccessoriesShop.Infrastructure.Authentication;
+using AccessoriesShop.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,22 +33,17 @@ namespace AccessoriesShop.Infrastructure
 
             // Đăng ký repositiries
             #region Repositories
-            
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
             #endregion
             // Đăng ký services
             #region services
-            
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtProvider, JwtProvider>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            // Đăng ký JWT authentication
-            //var jwtSettings = new JwtSettings();
-            //configuration.Bind(JwtSettings.SectionName, jwtSettings);
-            //services.AddSingleton(jwtSettings); // Dùng AddSingleton vì cài đặt không thay đổi
-            // Cấu hình dịch vụ Authentication của .NET Core
-
-            // Đăng ký MailSettings
-            //services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             // Đăng ký CORS
             services.AddCors(options =>
             {

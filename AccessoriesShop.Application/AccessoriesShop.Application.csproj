@@ -15,11 +15,4 @@
     <ProjectReference Include="..\AccessoriesShop.Domain\AccessoriesShop.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IServices\" />
-    <Folder Include="Services\" />
-    <Folder Include="ViewModels\Responses\" />
-    <Folder Include="ViewModels\Requests\" />
-  </ItemGroup>
-
 </Project>
