@@ -3,6 +3,7 @@ using System;
 using AccessoriesShop.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccessoriesShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205040436_productRelation")]
+    partial class productRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,8 +144,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
 
                     b.ToTable("Category");
                 });
@@ -397,16 +398,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.ToTable("ProductVariant");
                 });
 
-            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Category", b =>
-                {
-                    b.HasOne("AccessoriesShop.Domain.Entities.Category", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Order", b =>
                 {
                     b.HasOne("AccessoriesShop.Domain.Entities.Account", "Account")
@@ -522,8 +513,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Category", b =>
                 {
-                    b.Navigation("Children");
-
                     b.Navigation("Products");
                 });
 
