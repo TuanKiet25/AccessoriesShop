@@ -33,8 +33,18 @@ namespace AccessoriesShop.Infrastructure
 
             // Đăng ký repositiries
             #region Repositories
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<IDeviceRepository, DeviceRepository>();
+            services.AddScoped<IProductCompatibilityRepository, ProductCompatibilityRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IAttributesRepository, AttributesRepository>();
+            services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+            services.AddScoped<IProductVariantRepository, ProductVariantRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             #endregion
             // Đăng ký services
             #region services
