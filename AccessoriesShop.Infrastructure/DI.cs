@@ -47,10 +47,18 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             #endregion
             // Đăng ký services
-            #region services
+            #region Services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtProvider, JwtProvider>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IAttributesService, AttributesService>();
+            services.AddScoped<IBrandService, BrandService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IDeviceService, DeviceService>();
+            services.AddScoped<IProductCompatibilityService, ProductCompatibilityService>();
+            services.AddScoped<IProductAttributeService, ProductAttributeService>();
+            services.AddScoped<IProductVariantService, ProductVariantService>();
+            services.AddScoped<IProductService, ProductService>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

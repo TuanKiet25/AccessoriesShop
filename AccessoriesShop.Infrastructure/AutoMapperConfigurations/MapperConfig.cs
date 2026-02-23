@@ -1,21 +1,48 @@
 ﻿using AccessoriesShop.Application.ViewModels.Requests;
+using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Entities;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
 {
     public class MapperConfig : Profile
     {
-        //register all AutoMapper profiles
         public MapperConfig()
         {
+            // Account
             CreateMap<RegisterRequest, Account>().ReverseMap();
-        }
 
+            // Attributes
+            CreateMap<CreateAttributesRequest, Attributes>().ReverseMap();
+            CreateMap<Attributes, AttributesResponse>().ReverseMap();
+
+            // Brand
+            CreateMap<CreateBrandRequest, Brand>().ReverseMap();
+            CreateMap<Brand, BrandResponse>().ReverseMap();
+
+            // Category
+            CreateMap<CreateCategoryRequest, Category>().ReverseMap();
+            CreateMap<Category, CategoryResponse>().ReverseMap();
+
+            // Device
+            CreateMap<CreateDeviceRequest, Device>().ReverseMap();
+            CreateMap<Device, DeviceResponse>().ReverseMap();
+
+            // ProductCompatibility
+            CreateMap<CreateProductCompatibilityRequest, ProductCompatibility>().ReverseMap();
+            CreateMap<ProductCompatibility, ProductCompatibilityResponse>().ReverseMap();
+
+            // ProductAttribute
+            CreateMap<CreateProductAttributeRequest, ProductAttribute>().ReverseMap();
+            CreateMap<ProductAttribute, ProductAttributeResponse>().ReverseMap();
+
+            // ProductVariant
+            CreateMap<CreateProductVariantRequest, ProductVariant>().ReverseMap();
+            CreateMap<ProductVariant, ProductVariantResponse>().ReverseMap();
+
+            // Product
+            CreateMap<CreateProductRequest, Product>().ReverseMap();
+            CreateMap<Product, ProductResponse>().ReverseMap();
+        }
     }
 }
