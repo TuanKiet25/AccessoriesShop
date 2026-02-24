@@ -15,6 +15,7 @@ namespace AccessoriesShop.Infrastructure
         #region khai báo DbSet
         public virtual DbSet<Account> Accounts { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<OtpVerification> OtpVerifications { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder builder)
         {

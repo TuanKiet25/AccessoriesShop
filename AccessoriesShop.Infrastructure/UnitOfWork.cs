@@ -18,6 +18,7 @@ namespace AccessoriesShop.Infrastructure
         public IProductAttributeRepository ProductAttributes { get; }
         public IProductVariantRepository ProductVariants { get; }
         public ICategoryRepository Categories { get; }
+        public IOtpVerificationRepository OtpVerifications { get; }
 
         public UnitOfWork(
             AppDbContext context,
@@ -31,7 +32,8 @@ namespace AccessoriesShop.Infrastructure
             IAttributesRepository attributes,
             IProductAttributeRepository productAttributes,
             IProductVariantRepository productVariants,
-            ICategoryRepository categories)
+            ICategoryRepository categories,
+            IOtpVerificationRepository otpVerifications)
         {
             _context = context;
             Accounts = accounts;
@@ -45,6 +47,7 @@ namespace AccessoriesShop.Infrastructure
             ProductAttributes = productAttributes;
             ProductVariants = productVariants;
             Categories = categories;
+            OtpVerifications = otpVerifications;
         }
 
         public async Task<int> SaveChangesAsync()

@@ -5,6 +5,7 @@ using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.Services;
 using AccessoriesShop.Infrastructure.Authentication;
 using AccessoriesShop.Infrastructure.Repositories;
+using AccessoriesShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,10 +46,12 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
             services.AddScoped<IProductVariantRepository, ProductVariantRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IOtpVerificationRepository, OtpVerificationRepository>();
             #endregion
             // Đăng ký services
             #region Services
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IJwtProvider, JwtProvider>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IAttributesService, AttributesService>();

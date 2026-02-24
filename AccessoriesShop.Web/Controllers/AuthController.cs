@@ -20,11 +20,25 @@ namespace AccessoriesShop.Web.Controllers
             var response = await _authService.LoginAsync(request);
             return HandleResult(response);
         }
-        [HttpPost("register")]  
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             var response = await _authService.RegisterAsync(request);
             return HandleResult(response);
-        }   
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+        {
+            var response = await _authService.VerifyOtpAsync(request);
+            return HandleResult(response);
+        }
+
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpRequest request)
+        {
+            var response = await _authService.ResendOtpAsync(request);
+            return HandleResult(response);
+        }
     }
 }
