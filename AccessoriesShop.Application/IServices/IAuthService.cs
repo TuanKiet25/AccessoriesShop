@@ -12,5 +12,7 @@ namespace AccessoriesShop.Application.IServices
     {
         public Task<ServiceResult<string>> RegisterAsync(RegisterRequest request);
         public Task<ServiceResult<string>> LoginAsync(LoginRequest request);
+        public Task<ServiceResult<string>> VerifyOtpAsync(VerifyOtpRequest request);
+        public Task<ServiceResult<string>> ResendOtpAsync(ResendOtpRequest request);
     }
 }
