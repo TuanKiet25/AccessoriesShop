@@ -43,6 +43,20 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
             // Product
             CreateMap<CreateProductRequest, Product>().ReverseMap();
             CreateMap<Product, ProductResponse>().ReverseMap();
+
+            //Order
+            CreateMap<CreateOrderRequest, Order>()
+                .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => new List<OrderItem>()))
+                .ReverseMap();
+            CreateMap<CreateOrderItemRequest, OrderItem>().ReverseMap();
+            CreateMap<OrderItem, OrderItemResponse>().ReverseMap();
+            CreateMap<Order, OrderResponse>().ReverseMap();
+
+            // Payment
+            CreateMap<CreatePaymentRequest, Payment>().ReverseMap();
+            CreateMap<Payment, PaymentResponse>().ReverseMap();
+
+
         }
     }
 }

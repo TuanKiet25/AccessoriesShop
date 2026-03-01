@@ -36,6 +36,7 @@ namespace AccessoriesShop.Infrastructure
             //  đăng ký settings (DI đang ko chạy)
             services.Configure<PayOSSettings>(configuration.GetSection("PayOSSettings"));
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
+            services.Configure<ClientSettings>(configuration.GetSection("ClientSettings"));
             // Đăng ký repositiries
             #region Repositories
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -67,6 +68,10 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<IProductAttributeService, ProductAttributeService>();
             services.AddScoped<IProductVariantService, ProductVariantService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IPayOSService, PayOSService>();
+            services.AddScoped<IStockReservationService, StockReservationService>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

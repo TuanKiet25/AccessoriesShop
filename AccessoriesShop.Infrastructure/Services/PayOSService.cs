@@ -24,16 +24,19 @@ namespace AccessoriesShop.Infrastructure.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IIdGenerator<long> _idGenerator;
         private readonly ILogger<PayOSService> _logger;
+        private readonly IStockReservationService _stockReservationService;
 
         public PayOSService(
             IOptions<PayOSSettings> settings,
             IUnitOfWork unitOfWork,
             ILogger<PayOSService> logger,
-            IIdGenerator<long> idGenerator)
+            IIdGenerator<long> idGenerator,
+            IStockReservationService stockReservationService)
         {
             _settings = settings.Value;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _stockReservationService = stockReservationService;
 
             _payOS = new PayOSClient(new PayOSOptions
             {
@@ -61,15 +64,18 @@ namespace AccessoriesShop.Infrastructure.Services
                 }
 
                 // Generate unique orderCode (PayOS requires numeric long)
+                // Limit to 8 characters for better readability
                 long refCode = _idGenerator.CreateId();
+                string refCodeString = Math.Abs(refCode % 100000000).ToString().PadLeft(8, '0');
 
 
                 // Create payment record
                 var payment = new Payment
                 {
+                    Currency = "VND",
                     OrderId = request.OrderId,
                     PaymentMethod = PaymentGateway.PayOS,
-                    TransactionRef = refCode.ToString(),
+                    TransactionRef = refCodeString,
                     Amount = order.TotalAmount,
                     Status = PaymentStatus.Pending,
                     ExpiredAt = DateTime.UtcNow.AddMinutes(15)
@@ -79,14 +85,14 @@ namespace AccessoriesShop.Infrastructure.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 // Create PayOS payment link
-                var description = $"AccessoriesShop#{refCode}";
+                var description = $"AccessoriesShop#{refCodeString}";
                 // PayOS description max 25 chars
                 if (description.Length > 25)
                     description = description[..25];
 
                 var paymentRequest = new CreatePaymentLinkRequest
                 {
-                    OrderCode = refCode,
+                    OrderCode = long.Parse(refCodeString),
                     Amount = (long)order.TotalAmount,
                     Description = description,
                     CancelUrl = _settings.CancelUrl,
@@ -100,7 +106,7 @@ namespace AccessoriesShop.Infrastructure.Services
 
                 _logger.LogInformation(
                     "PayOS payment link created: PaymentId={PaymentId}, OrderCode={OrderCode}",
-                    payment.Id, refCode);
+                    payment.Id, refCodeString);
 
                 return new ServiceResult<PayOSResponse>
                 {
@@ -111,7 +117,7 @@ namespace AccessoriesShop.Infrastructure.Services
                         Success = true,
                         PaymentUrl = createPaymentResult.CheckoutUrl,
                         QrCode = createPaymentResult.QrCode,
-                        TransactionId = refCode.ToString()
+                        TransactionId = refCodeString
 
                     }
                 };
@@ -215,15 +221,19 @@ namespace AccessoriesShop.Infrastructure.Services
                         {
                             order.Status = OrderStatus.Confirmed;
                             await _unitOfWork.Orders.UpdateAsync(order);
-                            //await _stockService.ConfirmStockReservationAsync(order.Id);
-                            _logger.LogInformation("Order {OrderId} confirmed with PaymentMethod=PayOS, stock reservation confirmed", order.Id);
+                            var confirmResult = await _stockReservationService.ConfirmStockReservationAsync(order.Id);
+                            _logger.LogInformation(
+                                "Order {OrderId} confirmed with PaymentMethod=PayOS, stock reservation confirmed. StockConfirmResult: {StockConfirmResult}",
+                                order.Id, confirmResult.IsSuccess);
                         }
                         else if (isCancelled)
                         {
                             order.Status = OrderStatus.Cancelled;
                             await _unitOfWork.Orders.UpdateAsync(order);
-                            //await _stockService.RevertStockReservationAsync(order.Id);
-                            _logger.LogInformation("Order {OrderId} cancelled, stock reverted", order.Id);
+                            var revertResult = await _stockReservationService.RevertStockReservationAsync(order.Id);
+                            _logger.LogInformation(
+                                "Order {OrderId} cancelled, stock reverted. StockRevertResult: {StockRevertResult}",
+                                order.Id, revertResult.IsSuccess);
                         }
                     }
 
@@ -270,13 +280,19 @@ namespace AccessoriesShop.Infrastructure.Services
         {
             try
             {
+                _logger.LogInformation("ProcessWebhook: Attempting to verify signature");
+                _logger.LogInformation("Webhook data: OrderCode={OrderCode}, Amount={Amount}", 
+                    webhookBody?.Data?.OrderCode, webhookBody?.Data?.Amount);
+
                 // 1. Verify webhook signature
                 WebhookData verifiedData = await _payOS.Webhooks.VerifyAsync(webhookBody);
 
                 var orderCode = verifiedData.OrderCode.ToString();
 
+                _logger.LogInformation("Webhook signature verified successfully. OrderCode={OrderCode}", orderCode);
+
                 // 2. Find payment by orderCode (stored as TransactionRef)
-                var payment = await _unitOfWork.Payments.GetByOrderCodeAsync(verifiedData.Code, PaymentGateway.PayOS);
+                var payment = await _unitOfWork.Payments.GetByOrderCodeAsync(orderCode, PaymentGateway.PayOS);
 
                 if (payment == null)
                 {
@@ -331,13 +347,19 @@ namespace AccessoriesShop.Infrastructure.Services
                         {
                             order.Status = OrderStatus.Confirmed;
                             await _unitOfWork.Orders.UpdateAsync(order);
-                            //await _stockService.ConfirmStockReservationAsync(order.Id);
+                            var confirmResult = await _stockReservationService.ConfirmStockReservationAsync(order.Id);
+                            _logger.LogInformation(
+                                "Order {OrderId} confirmed, stock reservation confirmed. StockConfirmResult: {StockConfirmResult}",
+                                order.Id, confirmResult.IsSuccess);
                         }
                         else
                         {
-                            order.Status = OrderStatus.Cancelled;  // Sửa từ Pending thành Cancelled
+                            order.Status = OrderStatus.Cancelled;
                             await _unitOfWork.Orders.UpdateAsync(order);
-                            //await _stockService.RevertStockReservationAsync(order.Id);
+                            var revertResult = await _stockReservationService.RevertStockReservationAsync(order.Id);
+                            _logger.LogInformation(
+                                "Order {OrderId} cancelled, stock reverted. StockRevertResult: {StockRevertResult}",
+                                order.Id, revertResult.IsSuccess);
                         }
                     }
 
@@ -371,14 +393,22 @@ namespace AccessoriesShop.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing PayOS webhook");
+                _logger.LogError(ex, "Error processing PayOS webhook - {ExceptionType}: {Message}", 
+                    ex.GetType().Name, ex.Message);
+                
+                if (ex.Message.Contains("signature") || ex.Message.Contains("Kiểm tra"))
+                {
+                    _logger.LogError("SIGNATURE VERIFICATION FAILED! Please check:");
+                    _logger.LogError("1. ChecksumKey in appsettings.json matches PayOS Dashboard");
+                    _logger.LogError("2. Request body is being sent correctly");
+                    _logger.LogError("3. Webhook URL is registered correctly in PayOS Dashboard");
+                }
+                
                 return new ServiceResult<ProcessPaymentResult>
                 {
                     IsSuccess = false,
                     Message = ApiMessages.ServerError.General + $"\nError: {ex.Message}"
                 };
-
-
             }
         }
 

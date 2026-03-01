@@ -15,5 +15,21 @@ namespace AccessoriesShop.Domain.Entities
         public string? Status { get; set; }
         public List<OrderItem>? OrderItems { get; set; }
         public List<Payment>? Payments { get; set; }
+
+        /// <summary>
+        /// Automatically calculates the TotalAmount by summing up all OrderItem prices
+        /// </summary>
+        public void CalculateTotalAmount()
+        {
+            if (OrderItems != null && OrderItems.Count > 0)
+            {
+                TotalAmount = OrderItems.Sum(oi => oi.Price * oi.Quantity);
+            }
+            else
+            {
+                TotalAmount = 0;
+            }
+        }
     }
 }
+

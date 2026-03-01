@@ -16,26 +16,27 @@ namespace AccessoriesShop.Infrastructure.Repositories
 
         public async Task<Payment> GetByOrderCodeAsync(string code, string gateWay)
         {
-            if (string.IsNullOrWhiteSpace(code) && string.IsNullOrWhiteSpace(gateWay))
+            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(gateWay))
                 return null!;
 
-            // Start from base queryable and include Order navigation
-            var query = _db.Include(p => p.Order);
+            var codeNormalized = code.Trim().ToLower();
+            var gatewayNormalized = gateWay.Trim().ToLower();
 
-            var codeNormalized = code?.Trim();
-            var gatewayNormalized = gateWay?.Trim();
+            // First, filter by gateway in the database to narrow results
+            // This reduces the amount of data fetched
+            var paymentsByGateway = await _db.Include(p => p.Order)
+                .Where(p =>
+                    (p.PaymentMethod != null && p.PaymentMethod.ToLower() == gatewayNormalized)
+                    || (p.BankCode != null && p.BankCode.ToLower() == gatewayNormalized)
+                )
+                .ToListAsync();
 
-            var payment = await query.FirstOrDefaultAsync(p =>
-                (
-                    (!string.IsNullOrEmpty(p.TransactionRef) && string.Equals(p.TransactionRef, codeNormalized, StringComparison.OrdinalIgnoreCase))
-                    || (!string.IsNullOrEmpty(p.TransactionCode) && string.Equals(p.TransactionCode, codeNormalized, StringComparison.OrdinalIgnoreCase))
-                )
-                &&
-                (
-                    (!string.IsNullOrEmpty(p.PaymentMethod) && string.Equals(p.PaymentMethod, gatewayNormalized, StringComparison.OrdinalIgnoreCase))
-                    || (!string.IsNullOrEmpty(p.BankCode) && string.Equals(p.BankCode, gatewayNormalized, StringComparison.OrdinalIgnoreCase))
-                )
+            // Then perform case-insensitive code comparison in memory
+            var payment = paymentsByGateway.FirstOrDefault(p =>
+                (!string.IsNullOrEmpty(p.TransactionRef) && p.TransactionRef.ToLower() == codeNormalized)
+                || (!string.IsNullOrEmpty(p.TransactionCode) && p.TransactionCode.ToLower() == codeNormalized)
             );
+
             return payment!;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using AccessoriesShop.Infrastructure;
+using AccessoriesShop.Infrastructure.Seeding;
 using IdGen;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -66,11 +67,19 @@ builder.Services.AddControllers()
     });
 var app = builder.Build();
 
+// Enable request body buffering for PayOS webhook signature verification
+app.Use(async (context, next) =>
+{
+    context.Request.EnableBuffering();
+    await next();
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await app.Services.SeedDatabaseAsync(); // Chỉ seed dữ liệu khi ở môi trường Dev
 }
 
 app.UseHttpsRedirection();

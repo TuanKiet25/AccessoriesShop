@@ -89,6 +89,7 @@ namespace AccessoriesShop.Domain.Constants
             public const string Created = "Order created successfully.";
             public const string Updated = "Order updated successfully.";
             public const string Deleted = "Order deleted successfully.";
+            public const string CreatFailed = "Order creation failed. Please try again.";
         }
 
         public static class Payment
