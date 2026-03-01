@@ -30,7 +30,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var account = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email);
+                var account = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email && a.IsActive == true);
                 if (account is null || !_passwordHasher.Verify(request.Password, account.PasswordHash))
                 {
                     return new ServiceResult<string>
@@ -63,7 +63,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var existingUser = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email);
+                var existingUser = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email && a.IsActive == true);
                 if (existingUser != null)
                 {
                     return new ServiceResult<string>
@@ -105,6 +105,7 @@ namespace AccessoriesShop.Application.Services
             }
         }
 
+        //cách làm OTP này chắc cú trong trường hợp sập server, dừng đột ngột nhưng không tối ưu hiệu suất và khả năng 
         public async Task<ServiceResult<string>> VerifyOtpAsync(VerifyOtpRequest request)
         {
             try

@@ -1,7 +1,9 @@
+using AccessoriesShop.Application.Common.Settings;
 using AccessoriesShop.Application.IServices;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using System.Threading.Tasks;
 
@@ -9,23 +11,30 @@ namespace AccessoriesShop.Infrastructure.Services
 {
     public class EmailService : IEmailService
     {
+        private readonly MailSettings _mailSettings;
         private readonly IConfiguration _configuration;
-
-        public EmailService(IConfiguration configuration)
+        public EmailService(IOptions<MailSettings> mailSettings, IConfiguration configuration)
         {
+            _mailSettings = mailSettings.Value;
             _configuration = configuration;
         }
 
         public async Task SendOtpEmailAsync(string toEmail, string toName, string otpCode)
         {
-            var host = _configuration["EmailSettings:Host"]!;
-            var port = int.Parse(_configuration["EmailSettings:Port"]!);
-            var username = _configuration["EmailSettings:Username"]!;
-            var password = _configuration["EmailSettings:Password"]!;
-            var fromName = _configuration["EmailSettings:FromName"]!;
+            var host = _mailSettings.Host!;
+            var port = _mailSettings.Port!;
+            var email = _mailSettings.Email!;
+            var password = _mailSettings.Password!;
+            var displayname = _mailSettings.DisplayName!;
+
+            //var host = _configuration["MailSettings:Host"]!;
+            //var port = int.Parse(_configuration["MailSettings:Port"]!);
+            //var email = _configuration["MailSettings:Email"]!;
+            //var password = _configuration["MailSettings:Password"]!;
+            //var displayname = _configuration["MailSettings:DisplayName"]!;
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(fromName, username));
+            message.From.Add(new MailboxAddress(displayname, email));
             message.To.Add(new MailboxAddress(toName, toEmail));
             message.Subject = "Xác thực tài khoản - Mã OTP của bạn";
 
@@ -46,7 +55,7 @@ namespace AccessoriesShop.Infrastructure.Services
 
             using var client = new SmtpClient();
             await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync(username, password);
+            await client.AuthenticateAsync(email, password);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
         }

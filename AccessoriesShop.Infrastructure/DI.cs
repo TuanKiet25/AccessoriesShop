@@ -1,4 +1,5 @@
 ﻿using AccessoriesShop.Application;
+using AccessoriesShop.Application.Common.Settings;
 using AccessoriesShop.Application.IAuthentication;
 using AccessoriesShop.Application.IRepositories;
 using AccessoriesShop.Application.IServices;
@@ -32,6 +33,9 @@ namespace AccessoriesShop.Infrastructure
                     sql => sql.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
             });
 
+            //  đăng ký settings (DI đang ko chạy)
+            services.Configure<PayOSSettings>(configuration.GetSection("PayOSSettings"));
+            services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             // Đăng ký repositiries
             #region Repositories
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -47,6 +51,7 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<IProductVariantRepository, ProductVariantRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IOtpVerificationRepository, OtpVerificationRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
             #endregion
             // Đăng ký services
             #region Services
@@ -77,6 +82,7 @@ namespace AccessoriesShop.Infrastructure
                                             .AllowAnyMethod();
                                   });
             });
+            
             //đăng ký HttpContextAccessor
             //services.AddHttpContextAccessor();
             return services;
