@@ -56,6 +56,7 @@ namespace AccessoriesShop.Infrastructure
             #endregion
             // Đăng ký services
             #region Services
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IJwtProvider, JwtProvider>();

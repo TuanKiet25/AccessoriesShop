@@ -11,6 +11,10 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
         {
             // Account
             CreateMap<RegisterRequest, Account>().ReverseMap();
+            CreateMap<UpdateAccountRequest, Account>().ReverseMap();
+            CreateMap<Account, AccountResponse>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
+                .ReverseMap();
 
             // Attributes
             CreateMap<CreateAttributesRequest, Attributes>().ReverseMap();
