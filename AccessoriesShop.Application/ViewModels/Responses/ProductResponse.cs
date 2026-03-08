@@ -11,5 +11,8 @@ namespace AccessoriesShop.Application.ViewModels.Responses
         public string? BrandName { get; set; }
         public Guid CategoryId { get; set; }
         public string? CategoryName { get; set; }
+        public List<ProductVariantResponse>? Variants { get; set; }
+        public List<ProductAttributeResponse>? productAttributes { get; set; } 
+        public List<ProductCompatibilityResponse>? productCompatibilities { get; set; }
     }
 }

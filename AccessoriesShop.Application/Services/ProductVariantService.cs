@@ -31,10 +31,19 @@ namespace AccessoriesShop.Application.Services
                         Message = "ProductVariant not found."
                     };
                 }
+                var response = _mapper.Map<ProductVariantResponse>(entity);
+                
+                // Manually map ProductName from Product
+                var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                if (product != null)
+                {
+                    response.ProductName = product.Name;
+                }
+                
                 return new ServiceResult<ProductVariantResponse>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<ProductVariantResponse>(entity)
+                    Data = response
                 };
             }
             catch (Exception ex)
@@ -52,10 +61,22 @@ namespace AccessoriesShop.Application.Services
             try
             {
                 var entities = await _unitOfWork.ProductVariants.GetAllAsync(null);
+                var responses = _mapper.Map<List<ProductVariantResponse>>(entities);
+                
+                // Manually map ProductName for each item
+                foreach (var response in responses)
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                    if (product != null)
+                    {
+                        response.ProductName = product.Name;
+                    }
+                }
+                
                 return new ServiceResult<List<ProductVariantResponse>>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<List<ProductVariantResponse>>(entities)
+                    Data = responses
                 };
             }
             catch (Exception ex)
@@ -75,10 +96,20 @@ namespace AccessoriesShop.Application.Services
                 var entity = _mapper.Map<ProductVariant>(request);
                 await _unitOfWork.ProductVariants.AddAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
+                
+                var response = _mapper.Map<ProductVariantResponse>(entity);
+                
+                // Manually map ProductName from Product
+                var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                if (product != null)
+                {
+                    response.ProductName = product.Name;
+                }
+                
                 return new ServiceResult<ProductVariantResponse>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<ProductVariantResponse>(entity),
+                    Data = response,
                     Message = "ProductVariant created successfully."
                 };
             }
@@ -109,10 +140,20 @@ namespace AccessoriesShop.Application.Services
                 _mapper.Map(request, entity);
                 await _unitOfWork.ProductVariants.UpdateAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
+                
+                var response = _mapper.Map<ProductVariantResponse>(entity);
+                
+                // Manually map ProductName from Product
+                var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                if (product != null)
+                {
+                    response.ProductName = product.Name;
+                }
+                
                 return new ServiceResult<ProductVariantResponse>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<ProductVariantResponse>(entity),
+                    Data = response,
                     Message = "ProductVariant updated successfully."
                 };
             }

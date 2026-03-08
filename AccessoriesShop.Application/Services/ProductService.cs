@@ -3,6 +3,7 @@ using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Entities;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace AccessoriesShop.Application.Services
 {
@@ -21,7 +22,10 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Products.GetByIdAsync(id);
+                var entity = await _unitOfWork.Products.GetAsync(p => p.Id == id, include: 
+                    e => e.Include(p => p.Variants)
+                          .Include(p => p.productAttributes).ThenInclude(P => P.Attribute)
+                          .Include(p => p.productCompatibilities).ThenInclude(p => p.Device));
                 if (entity == null)
                 {
                     return new ServiceResult<ProductResponse>
@@ -64,7 +68,10 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.Products.GetAllAsync(e => !e.isDeleted);
+                var entities = await _unitOfWork.Products.GetAllAsync(e => !e.isDeleted, include:
+                    e => e.Include(p => p.Variants)
+                          .Include(p => p.productAttributes).ThenInclude(P => P.Attribute)
+                          .Include(p => p.productCompatibilities).ThenInclude(p => p.Device));
                 var responseList = new List<ProductResponse>();
                 foreach (var entity in entities)
                 {
@@ -76,6 +83,14 @@ namespace AccessoriesShop.Application.Services
                         response.BrandName = brand.Name;
                         response.CategoryName = category.Name;
                         responseList.Add(response);
+                    }
+                    else
+                    {
+                        return new ServiceResult<List<ProductResponse>>
+                        {
+                            IsSuccess = false,
+                            Message = "One or more products have invalid BrandId or CategoryId."
+                        };
                     }
                 }
                 return new ServiceResult<List<ProductResponse>>
@@ -112,7 +127,11 @@ namespace AccessoriesShop.Application.Services
                         Message = "Invalid BrandId or CategoryId."
                     };
                 }
-                var response = _mapper.Map<ProductResponse>(entity);
+                var entityResult = await _unitOfWork.Products.GetAsync(e => e.Id == entity.Id, include:
+                    q => q.Include(p => p.Variants)
+                          .Include(p => p.productAttributes).ThenInclude(P => P.Attribute)
+                          .Include(p => p.productCompatibilities).ThenInclude(p => p.Device));
+                var response = _mapper.Map<ProductResponse>(entityResult);
                 response.BrandName = brand.Name;
                 response.CategoryName = category.Name;
                 return new ServiceResult<ProductResponse>
@@ -147,7 +166,6 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
                 _mapper.Map(request, entity);
-                await _unitOfWork.Products.UpdateAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
                 var brand = await _unitOfWork.Brands.GetByIdAsync(request.BrandId);
                 var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
@@ -159,6 +177,10 @@ namespace AccessoriesShop.Application.Services
                         Message = "Invalid BrandId or CategoryId."
                     };
                 }
+                var entityResult = await _unitOfWork.Products.GetAsync(e => e.Id == entity.Id, include:
+                    q => q.Include(p => p.Variants)
+                          .Include(p => p.productAttributes).ThenInclude(P => P.Attribute)
+                          .Include(p => p.productCompatibilities).ThenInclude(p => p.Device));
                 var response = _mapper.Map<ProductResponse>(entity);
                 response.BrandName = brand.Name;
                 response.CategoryName = category.Name;

@@ -31,10 +31,26 @@ namespace AccessoriesShop.Application.Services
                         Message = "ProductCompatibility not found."
                     };
                 }
+                var response = _mapper.Map<ProductCompatibilityResponse>(entity);
+                
+                // Manually map ProductName from Product
+                var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                if (product != null)
+                {
+                    response.ProductName = product.Name;
+                }
+                
+                // Manually map DeviceName from Device
+                var device = await _unitOfWork.Devices.GetByIdAsync(response.DeviceId);
+                if (device != null)
+                {
+                    response.DeviceName = device.Name;
+                }
+                
                 return new ServiceResult<ProductCompatibilityResponse>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<ProductCompatibilityResponse>(entity)
+                    Data = response
                 };
             }
             catch (Exception ex)
@@ -52,10 +68,28 @@ namespace AccessoriesShop.Application.Services
             try
             {
                 var entities = await _unitOfWork.ProductCompatibilities.GetAllAsync(null);
+                var responses = _mapper.Map<List<ProductCompatibilityResponse>>(entities);
+                
+                // Manually map ProductName and DeviceName for each item
+                foreach (var response in responses)
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                    if (product != null)
+                    {
+                        response.ProductName = product.Name;
+                    }
+                    
+                    var device = await _unitOfWork.Devices.GetByIdAsync(response.DeviceId);
+                    if (device != null)
+                    {
+                        response.DeviceName = device.Name;
+                    }
+                }
+                
                 return new ServiceResult<List<ProductCompatibilityResponse>>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<List<ProductCompatibilityResponse>>(entities)
+                    Data = responses
                 };
             }
             catch (Exception ex)
@@ -75,10 +109,27 @@ namespace AccessoriesShop.Application.Services
                 var entity = _mapper.Map<ProductCompatibility>(request);
                 await _unitOfWork.ProductCompatibilities.AddAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
+                
+                var response = _mapper.Map<ProductCompatibilityResponse>(entity);
+                
+                // Manually map ProductName from Product
+                var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                if (product != null)
+                {
+                    response.ProductName = product.Name;
+                }
+                
+                // Manually map DeviceName from Device
+                var device = await _unitOfWork.Devices.GetByIdAsync(response.DeviceId);
+                if (device != null)
+                {
+                    response.DeviceName = device.Name;
+                }
+                
                 return new ServiceResult<ProductCompatibilityResponse>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<ProductCompatibilityResponse>(entity),
+                    Data = response,
                     Message = "ProductCompatibility created successfully."
                 };
             }
@@ -109,10 +160,27 @@ namespace AccessoriesShop.Application.Services
                 _mapper.Map(request, entity);
                 await _unitOfWork.ProductCompatibilities.UpdateAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
+                
+                var response = _mapper.Map<ProductCompatibilityResponse>(entity);
+                
+                // Manually map ProductName from Product
+                var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                if (product != null)
+                {
+                    response.ProductName = product.Name;
+                }
+                
+                // Manually map DeviceName from Device
+                var device = await _unitOfWork.Devices.GetByIdAsync(response.DeviceId);
+                if (device != null)
+                {
+                    response.DeviceName = device.Name;
+                }
+                
                 return new ServiceResult<ProductCompatibilityResponse>
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<ProductCompatibilityResponse>(entity),
+                    Data = response,
                     Message = "ProductCompatibility updated successfully."
                 };
             }
