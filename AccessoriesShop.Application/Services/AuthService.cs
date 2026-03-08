@@ -17,7 +17,12 @@ namespace AccessoriesShop.Application.Services
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
 
-        public AuthService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, IJwtProvider jwtProvider, IMapper mapper, IEmailService emailService)
+        public AuthService(
+            IUnitOfWork unitOfWork,
+            IPasswordHasher passwordHasher,
+            IJwtProvider jwtProvider,
+            IMapper mapper,
+            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
@@ -26,32 +31,49 @@ namespace AccessoriesShop.Application.Services
             _emailService = emailService;
         }
 
-        public async Task<ServiceResult<string>> LoginAsync(LoginRequest request)
+     
+        public async Task<ServiceResult<LoginResponse>> LoginAsync(LoginRequest request)
         {
             try
             {
-                var account = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email && a.IsActive == true);
+                var account = await _unitOfWork.Accounts
+                    .GetAsync(a => a.Email == request.Email);
+
                 if (account is null || !_passwordHasher.Verify(request.Password, account.PasswordHash))
                 {
-                    return new ServiceResult<string>
+                    return new ServiceResult<LoginResponse>
                     {
                         IsSuccess = false,
                         Message = "Invalid email or password."
                     };
                 }
+
                 if (!account.IsActive)
                 {
-                    return new ServiceResult<string>
+                    return new ServiceResult<LoginResponse>
                     {
                         IsSuccess = false,
                         Message = "Account is not verified. Please verify your OTP sent to your email."
                     };
                 }
-                return new ServiceResult<string> { Data = $"Login success with ID :{account.Id}, jwt Key:{_jwtProvider.Generate(account)}", IsSuccess = true };
+
+                var token = _jwtProvider.Generate(account);
+
+                return new ServiceResult<LoginResponse>
+                {
+                    IsSuccess = true,
+                    Data = new LoginResponse
+                    {
+                        Id = account.Id,
+                        Token = token,
+                        Email = account.Email,
+                        Role = account.Role.ToString()
+                    }
+                };
             }
             catch (Exception ex)
             {
-                return new ServiceResult<string>
+                return new ServiceResult<LoginResponse>
                 {
                     IsSuccess = false,
                     Message = ex.Message
@@ -63,7 +85,9 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var existingUser = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email && a.IsActive == true);
+                var existingUser = await _unitOfWork.Accounts
+                    .GetAsync(a => a.Email == request.Email && a.IsActive == true);
+
                 if (existingUser != null)
                 {
                     return new ServiceResult<string>
@@ -72,14 +96,16 @@ namespace AccessoriesShop.Application.Services
                         Message = "Email is already registered."
                     };
                 }
+
                 var account = _mapper.Map<Account>(request);
                 account.PasswordHash = _passwordHasher.Hash(request.PasswordHash);
                 account.Role = Domain.Enums.Role.User;
                 account.IsActive = false;
+
                 await _unitOfWork.Accounts.AddAsync(account);
 
-                // Tạo OTP và gửi mail
                 var otpCode = GenerateOtpCode();
+
                 var otp = new OtpVerification
                 {
                     AccountId = account.Id,
@@ -88,12 +114,17 @@ namespace AccessoriesShop.Application.Services
                     IsUsed = false,
                     CreatedAt = DateTime.UtcNow
                 };
+
                 await _unitOfWork.OtpVerifications.AddAsync(otp);
                 await _unitOfWork.SaveChangesAsync();
 
                 await _emailService.SendOtpEmailAsync(account.Email, account.Username, otpCode);
 
-                return new ServiceResult<string> { IsSuccess = true, Message = "Register successfully! Please check your email for the OTP to verify your account." };
+                return new ServiceResult<string>
+                {
+                    IsSuccess = true,
+                    Message = "Register successfully! Please check your email for the OTP to verify your account."
+                };
             }
             catch (Exception ex)
             {
@@ -105,12 +136,13 @@ namespace AccessoriesShop.Application.Services
             }
         }
 
-        //cách làm OTP này chắc cú trong trường hợp sập server, dừng đột ngột nhưng không tối ưu hiệu suất và khả năng 
         public async Task<ServiceResult<string>> VerifyOtpAsync(VerifyOtpRequest request)
         {
             try
             {
-                var account = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email);
+                var account = await _unitOfWork.Accounts
+                    .GetAsync(a => a.Email == request.Email);
+
                 if (account is null)
                 {
                     return new ServiceResult<string>
@@ -129,11 +161,11 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
 
-                var otps = await _unitOfWork.OtpVerifications.GetAllAsync(
-                    o => o.AccountId == account.Id && !o.IsUsed);
+                var otps = await _unitOfWork.OtpVerifications
+                    .GetAllAsync(o => o.AccountId == account.Id && !o.IsUsed);
 
-                // Lấy OTP mới nhất chưa dùng
                 OtpVerification? validOtp = null;
+
                 foreach (var o in otps)
                 {
                     if (o.OtpCode == request.OtpCode && o.ExpiresAt > DateTime.UtcNow)
@@ -152,18 +184,20 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
 
-                // Đánh dấu OTP đã dùng
                 validOtp.IsUsed = true;
                 await _unitOfWork.OtpVerifications.UpdateAsync(validOtp);
 
-                // Kích hoạt tài khoản
                 account.IsActive = true;
                 account.UpdateTime = DateTime.UtcNow;
                 await _unitOfWork.Accounts.UpdateAsync(account);
 
                 await _unitOfWork.SaveChangesAsync();
 
-                return new ServiceResult<string> { IsSuccess = true, Message = "Account verified successfully! You can now log in." };
+                return new ServiceResult<string>
+                {
+                    IsSuccess = true,
+                    Message = "Account verified successfully! You can now log in."
+                };
             }
             catch (Exception ex)
             {
@@ -179,7 +213,9 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var account = await _unitOfWork.Accounts.GetAsync(a => a.Email == request.Email);
+                var account = await _unitOfWork.Accounts
+                    .GetAsync(a => a.Email == request.Email);
+
                 if (account is null)
                 {
                     return new ServiceResult<string>
@@ -198,8 +234,8 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
 
-                // Tạo OTP mới
                 var otpCode = GenerateOtpCode();
+
                 var otp = new OtpVerification
                 {
                     AccountId = account.Id,
@@ -208,12 +244,17 @@ namespace AccessoriesShop.Application.Services
                     IsUsed = false,
                     CreatedAt = DateTime.UtcNow
                 };
+
                 await _unitOfWork.OtpVerifications.AddAsync(otp);
                 await _unitOfWork.SaveChangesAsync();
 
                 await _emailService.SendOtpEmailAsync(account.Email, account.Username, otpCode);
 
-                return new ServiceResult<string> { IsSuccess = true, Message = "OTP has been resent to your email." };
+                return new ServiceResult<string>
+                {
+                    IsSuccess = true,
+                    Message = "OTP has been resent to your email."
+                };
             }
             catch (Exception ex)
             {
