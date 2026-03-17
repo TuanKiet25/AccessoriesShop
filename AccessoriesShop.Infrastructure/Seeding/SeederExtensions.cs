@@ -29,10 +29,10 @@ namespace AccessoriesShop.Infrastructure.Seeding
 
                 try
                 {
-                    // your seeding option here
-                    // await seeder._____
+                     // your seeding option here
+                     // await seeder._____
 
-                    //await seeder.SeedDatabase();
+                    // await seeder.SeedDatabase();
 
                    
                 }

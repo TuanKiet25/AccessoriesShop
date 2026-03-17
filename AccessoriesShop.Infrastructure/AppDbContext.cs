@@ -26,6 +26,8 @@ namespace AccessoriesShop.Infrastructure
         public virtual DbSet<Attributes> Attributes { get; set; }
         public virtual DbSet<ProductAttribute> ProductAttributes { get; set; }
         public virtual DbSet<ProductCompatibility> ProductCompatibilities { get; set; }
+        public virtual DbSet<CustomOrder> CustomOrders { get; set; }
+        public virtual DbSet<CustomOrderFile> CustomOrderFiles { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder builder)
         {

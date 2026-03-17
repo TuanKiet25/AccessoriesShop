@@ -60,6 +60,12 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
             CreateMap<CreatePaymentRequest, Payment>().ReverseMap();
             CreateMap<Payment, PaymentResponse>().ReverseMap();
 
+            // Custom Order
+            CreateMap<CreateCustomOrderRequest, CustomOrder>()
+                .ForMember(dest => dest.Files, opt => opt.Ignore());
+            CreateMap<CustomOrderFile, CustomOrderFileResponse>().ReverseMap();
+            CreateMap<CustomOrder, CustomOrderResponse>().ReverseMap();
+
 
         }
     }

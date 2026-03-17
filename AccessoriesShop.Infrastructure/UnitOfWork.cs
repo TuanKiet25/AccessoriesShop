@@ -20,6 +20,7 @@ namespace AccessoriesShop.Infrastructure
         public ICategoryRepository Categories { get; }
         public IOtpVerificationRepository OtpVerifications { get; }
         public IPaymentRepository Payments { get; }
+        public ICustomOrderRepository CustomOrders { get; }
 
         public UnitOfWork(
             AppDbContext context,
@@ -35,7 +36,8 @@ namespace AccessoriesShop.Infrastructure
             IProductVariantRepository productVariants,
             ICategoryRepository categories,
             IOtpVerificationRepository otpVerifications,
-            IPaymentRepository payments)
+            IPaymentRepository payments,
+            ICustomOrderRepository customOrders)
         {
             _context = context;
             Accounts = accounts;
@@ -51,6 +53,7 @@ namespace AccessoriesShop.Infrastructure
             Categories = categories;
             OtpVerifications = otpVerifications;
             Payments = payments;
+            CustomOrders = customOrders;
         }
 
         public async Task<int> SaveChangesAsync()
