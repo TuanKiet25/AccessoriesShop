@@ -17,6 +17,8 @@ namespace AccessoriesShop.Application
         ICategoryRepository Categories { get; }
         IOtpVerificationRepository OtpVerifications { get; }
         IPaymentRepository Payments { get; }
+        ICartItemRepository CartItems { get; }
+        ICartRepository Carts { get; }
         Task<int> SaveChangesAsync();
     }
 }

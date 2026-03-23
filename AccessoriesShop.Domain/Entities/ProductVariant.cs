@@ -18,5 +18,6 @@ namespace AccessoriesShop.Domain.Entities
         public string? Size { get; set; }
         public decimal Price { get; set; }
         public List<OrderItem>? OrderItems { get; set; }
+        public List<CartItem>? CartItems { get; set; }
     }
 }

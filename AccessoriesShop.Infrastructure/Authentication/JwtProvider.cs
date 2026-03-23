@@ -26,7 +26,7 @@ namespace AccessoriesShop.Infrastructure.Authentication
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
-            {
+            { 
             new Claim(JwtRegisteredClaimNames.Sub, account.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, account.Email),
             new Claim("role", account.Role.ToString())

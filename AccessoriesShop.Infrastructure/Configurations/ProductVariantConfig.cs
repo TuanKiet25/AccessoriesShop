@@ -43,6 +43,10 @@ namespace AccessoriesShop.Infrastructure.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(v => v.Sku).IsUnique();
+            builder.HasMany(c => c.CartItems)
+              .WithOne(p => p.ProductVariant)
+              .HasForeignKey(c => c.ProductVariantId)
+              .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

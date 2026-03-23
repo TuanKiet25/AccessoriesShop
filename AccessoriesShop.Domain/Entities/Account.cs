@@ -17,5 +17,6 @@ namespace AccessoriesShop.Domain.Entities
         public bool IsActive { get; set; } = false;
         public List<Order>? Orders { get; set; }
         public List<OtpVerification>? OtpVerifications { get; set; }
+        public Cart? Cart { get; set; }
     }
 }

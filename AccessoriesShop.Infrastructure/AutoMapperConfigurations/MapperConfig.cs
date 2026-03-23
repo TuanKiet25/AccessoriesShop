@@ -60,7 +60,10 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
             CreateMap<CreatePaymentRequest, Payment>().ReverseMap();
             CreateMap<Payment, PaymentResponse>().ReverseMap();
 
-
+            // CartItem
+            CreateMap<CartItemRequest, CartItem>().ReverseMap();
+            CreateMap<CartItem, CartItemResponse>().ReverseMap(); 
+            CreateMap<Cart, CartResponse>().ReverseMap();
         }
     }
 }

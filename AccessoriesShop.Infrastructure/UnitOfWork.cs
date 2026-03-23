@@ -20,6 +20,8 @@ namespace AccessoriesShop.Infrastructure
         public ICategoryRepository Categories { get; }
         public IOtpVerificationRepository OtpVerifications { get; }
         public IPaymentRepository Payments { get; }
+        public ICartItemRepository CartItems { get; }
+        public ICartRepository Carts { get; }
 
         public UnitOfWork(
             AppDbContext context,
@@ -35,7 +37,9 @@ namespace AccessoriesShop.Infrastructure
             IProductVariantRepository productVariants,
             ICategoryRepository categories,
             IOtpVerificationRepository otpVerifications,
-            IPaymentRepository payments)
+            IPaymentRepository payments,
+            ICartItemRepository cartItems,
+            ICartRepository carts)
         {
             _context = context;
             Accounts = accounts;
@@ -51,6 +55,8 @@ namespace AccessoriesShop.Infrastructure
             Categories = categories;
             OtpVerifications = otpVerifications;
             Payments = payments;
+            CartItems = cartItems;
+            Carts = carts;
         }
 
         public async Task<int> SaveChangesAsync()

@@ -42,6 +42,8 @@ namespace AccessoriesShop.Infrastructure.Configurations
                 .WithOne(p => p.Product)
                 .HasForeignKey(v => v.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+          
         }
     }
 }

@@ -19,5 +19,6 @@ namespace AccessoriesShop.Domain.Entities
         public List<ProductVariant>? Variants { get; set; }
         public List<ProductAttribute>? productAttributes { get; set; }
         public List<ProductCompatibility>? productCompatibilities { get; set; }
+
     }
 }
