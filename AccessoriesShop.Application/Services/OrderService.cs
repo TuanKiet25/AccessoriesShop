@@ -4,10 +4,13 @@ using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Constants;
 using AccessoriesShop.Domain.Entities;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,17 +22,19 @@ namespace AccessoriesShop.Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
         private readonly IStockReservationService _stockReservationService;
-
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public OrderService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<OrderService> logger,
-            IStockReservationService stockReservationService)
+            IStockReservationService stockReservationService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _stockReservationService = stockReservationService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ServiceResult<OrderResponse>> GetByIdAsync(Guid id)
@@ -348,6 +353,114 @@ namespace AccessoriesShop.Application.Services
             {
                 _logger.LogError($"Error deleting order: {ex.Message}");
                 return new ServiceResult<string>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ServiceResult<OrderResponse>> PlaceOrderFromCartAsync(Guid cartId)
+        {
+            try
+            {
+                // 2. Lấy toàn bộ CartItems trong giỏ hàng (Phải Include ProductVariant để lấy giá và tồn kho)
+                var cartItems = await _unitOfWork.CartItems.GetAllAsync(
+                    filter: ci => ci.CartId == cartId,
+                    include: q => q.Include(ci => ci.ProductVariant)
+                );
+
+                if (cartItems == null || !cartItems.Any())
+                {
+                    return new ServiceResult<OrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = "Giỏ hàng của bạn đang trống."
+                    };
+                }
+                var userIdString = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                    throw new Exception("Invalid ID from token");
+                // 3. Khởi tạo thực thể Order
+                var order = new Order
+                {
+                    AccountId = userId, 
+                    OrderDate = DateTime.UtcNow,
+                    Status = OrderStatus.Pending,
+                    OrderItems = new List<OrderItem>()
+                };
+
+                // 4. Lặp qua danh sách giỏ hàng để kiểm tra kho và tạo OrderItem
+                foreach (var cartItem in cartItems)
+                {
+                    var variant = cartItem.ProductVariant;
+
+                    // Kiểm tra tồn kho ngay lập tức
+                    if (variant == null || variant.StockQuantity < cartItem.Quantity)
+                    {
+                        return new ServiceResult<OrderResponse>
+                        {
+                            IsSuccess = false,
+                            Message = $"sản phẩm{variant?.Name} không đủ hàng tồn kho"
+                        };
+                    }
+
+                    // Tạo OrderItem (Snapshot giá tại thời điểm mua)
+                    var orderItem = new OrderItem
+                    {
+                        OrderId = order.Id,
+                        VariantId = cartItem.ProductVariantId,
+                        Quantity = cartItem.Quantity,
+                        Price = variant.Price // Chốt giá từ DB vào OrderItem
+                    };
+
+                    order.OrderItems.Add(orderItem);
+                }
+
+                // 5. Tính tổng tiền và lưu Đơn hàng
+                order.CalculateTotalAmount();
+                await _unitOfWork.Orders.AddAsync(order);
+
+                // 6. XÓA GIỎ HÀNG (Dọn dẹp sau khi đã tạo Order xong)
+                _unitOfWork.CartItems.RemoveRange(cartItems);
+
+                // 7. Lưu tất cả thay đổi vào DB lần 1 (Để lấy ID và chốt dữ liệu)
+                await _unitOfWork.SaveChangesAsync();
+
+                // 8. Gọi dịch vụ giữ chỗ kho (Giống hàm Create cũ của bạn)
+                var stockReservationResult = await _stockReservationService.ReserveStockAsync(order.Id);
+                if (!stockReservationResult.IsSuccess)
+                {
+                    // Stock reservation failed - delete the order
+                    await _unitOfWork.Orders.DeleteAsync(order.Id);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    _logger.LogWarning($"Stock reservation failed for order {order.Id}. Order deleted. Reason: {stockReservationResult.Message}");
+                    return new ServiceResult<OrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Order creation failed: {stockReservationResult.Message}"
+                    };
+                }
+
+                var createdOrder = await _unitOfWork.Orders.GetByIdAsync(order.Id);
+                var response = _mapper.Map<OrderResponse>(createdOrder);
+                if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
+                {
+                    response.Items = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
+                }
+
+                return new ServiceResult<OrderResponse>
+                {
+                    IsSuccess = true,
+                    Data = response,
+                    Message = ApiMessages.Order.Created
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error creating order: {ex.Message}");
+                return new ServiceResult<OrderResponse>
                 {
                     IsSuccess = false,
                     Message = ex.Message

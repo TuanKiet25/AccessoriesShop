@@ -80,6 +80,12 @@ namespace AccessoriesShop.Web.Controllers
             var response = await _orderService.DeleteAsync(id);
             return HandleResult(response);
         }
+        [HttpPost("Create-order-by-card-id/{id}")]
+        public async Task<IActionResult> CreateOrderByCartId(Guid id)
+        {
+            var response = await _orderService.PlaceOrderFromCartAsync(id);
+            return HandleResult(response);
+        }
 
         // Helper method to extract user id from ClaimsPrincipal
         private Guid GetUserId(ClaimsPrincipal user)
@@ -91,5 +97,6 @@ namespace AccessoriesShop.Web.Controllers
             }
             return Guid.Empty;
         }
+        
     }
 }

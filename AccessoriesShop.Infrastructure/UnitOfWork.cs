@@ -40,8 +40,7 @@ namespace AccessoriesShop.Infrastructure
             IOtpVerificationRepository otpVerifications,
             IPaymentRepository payments,
             ICartItemRepository cartItems,
-            ICartRepository carts)
-            IPaymentRepository payments,
+            ICartRepository carts,
             ICustomOrderRepository customOrders)
         {
             _context = context;
