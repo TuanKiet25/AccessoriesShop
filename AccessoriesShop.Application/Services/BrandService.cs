@@ -21,7 +21,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Brands.GetByIdAsync(id);
+                var entity = await _unitOfWork.Brands.GetAsync(e=> e.Id == id && !e.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<BrandResponse>
@@ -51,7 +51,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.Brands.GetAllAsync(null);
+                var entities = await _unitOfWork.Brands.GetAllAsync(e => !e.isDeleted);
                 return new ServiceResult<List<BrandResponse>>
                 {
                     IsSuccess = true,

@@ -21,7 +21,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Devices.GetByIdAsync(id);
+                var entity = await _unitOfWork.Devices.GetAsync(e => e.Id == id && !e.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<DeviceResponse>
@@ -51,7 +51,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.Devices.GetAllAsync(null);
+                var entities = await _unitOfWork.Devices.GetAllAsync(e => !e.isDeleted);
                 return new ServiceResult<List<DeviceResponse>>
                 {
                     IsSuccess = true,

@@ -22,7 +22,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Products.GetAsync(p => p.Id == id, include: 
+                var entity = await _unitOfWork.Products.GetAsync(p => p.Id == id && !p.isDeleted, include: 
                     e => e.Include(p => p.Variants)
                           .Include(p => p.productAttributes).ThenInclude(P => P.Attribute)
                           .Include(p => p.productCompatibilities).ThenInclude(p => p.Device));

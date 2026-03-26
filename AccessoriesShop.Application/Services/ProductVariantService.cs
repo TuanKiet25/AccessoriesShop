@@ -21,7 +21,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.ProductVariants.GetByIdAsync(id);
+                var entity = await _unitOfWork.ProductVariants.GetAsync(e => e.Id == id && !e.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<ProductVariantResponse>
@@ -60,7 +60,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.ProductVariants.GetAllAsync(null);
+                var entities = await _unitOfWork.ProductVariants.GetAllAsync(e => !e.isDeleted);
                 var responses = _mapper.Map<List<ProductVariantResponse>>(entities);
                 
                 // Manually map ProductName for each item
