@@ -88,6 +88,19 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
+                var userIdString = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                    throw new Exception("Invalid ID from token");
+                var userCart = await _unitOfWork.Carts.GetAsync(c => c.AccountId == userId);
+                if(userCart == null)
+                {
+                    return new ServiceResult<CartItemResponse>
+                    {
+                        IsSuccess = false,
+                        IsNotFound = true,
+                        Message = "Cart not found for user! Please create a cart first!"
+                    };
+                }
                 var productVariant = await _unitOfWork.ProductVariants.GetByIdAsync(request.ProductVariantId);    
                 if (productVariant == null)
                 {
@@ -107,6 +120,7 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
                 var entity = _mapper.Map<CartItem>(request);
+                entity.CartId = userCart.Id;
                 entity.CreateTime = DateTime.UtcNow;
                 entity.UpdateTime = DateTime.UtcNow;
                 
@@ -135,6 +149,19 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
+                var userIdString = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                    throw new Exception("Invalid ID from token");
+                var userCart = await _unitOfWork.Carts.GetAsync(c => c.AccountId == userId);
+                if (userCart == null)
+                {
+                    return new ServiceResult<CartItemResponse>
+                    {
+                        IsSuccess = false,
+                        IsNotFound = true,
+                        Message = "Cart not found for user! Please create a cart first!"
+                    };
+                }
                 var productVariant = await _unitOfWork.ProductVariants.GetByIdAsync(request.ProductVariantId);
                 if (productVariant == null)
                 {
@@ -164,7 +191,7 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
 
-                entity.CartId = request.CartId;
+                entity.CartId = userCart.Id;
                 entity.ProductVariantId = request.ProductVariantId;
                 entity.Quantity = request.Quantity;
                 entity.CreateTime = DateTime.UtcNow;

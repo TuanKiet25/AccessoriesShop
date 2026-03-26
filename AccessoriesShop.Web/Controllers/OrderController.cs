@@ -1,6 +1,7 @@
 ﻿using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.ViewModels.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace AccessoriesShop.Web.Controllers
@@ -80,10 +81,10 @@ namespace AccessoriesShop.Web.Controllers
             var response = await _orderService.DeleteAsync(id);
             return HandleResult(response);
         }
-        [HttpPost("Create-order-by-card-id/{id}")]
-        public async Task<IActionResult> CreateOrderByCartId(Guid id)
+        [HttpPost("Create-order-by-card-Items-id")]
+        public async Task<IActionResult> CreateOrderByCartId(List<Guid> cartItemIds)
         {
-            var response = await _orderService.PlaceOrderFromCartAsync(id);
+            var response = await _orderService.PlaceOrderFromSelectedItemsAsync(cartItemIds);
             return HandleResult(response);
         }
 

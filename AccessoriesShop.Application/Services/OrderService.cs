@@ -360,14 +360,20 @@ namespace AccessoriesShop.Application.Services
             }
         }
 
-        public async Task<ServiceResult<OrderResponse>> PlaceOrderFromCartAsync(Guid cartId)
+        public async Task<ServiceResult<OrderResponse>> PlaceOrderFromSelectedItemsAsync(List<Guid> cartItemIds)
         {
             try
             {
-                // 2. Lấy toàn bộ CartItems trong giỏ hàng (Phải Include ProductVariant để lấy giá và tồn kho)
+                // 1. Lấy thông tin UserId từ Token
+                var userIdString = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                    throw new Exception("Invalid ID from token");
+
+                // 2. Lấy các CartItems dựa trên danh sách ID được chọn
+                // Phải filter thêm theo UserId để đảm bảo khách không "hack" chọn item của người khác
                 var cartItems = await _unitOfWork.CartItems.GetAllAsync(
-                    filter: ci => ci.CartId == cartId,
-                    include: q => q.Include(ci => ci.ProductVariant)
+                    filter: ci => cartItemIds.Contains(ci.Id) && ci.Cart.AccountId == userId,
+                    include: q => q.Include(ci => ci.ProductVariant).Include(ci => ci.Cart)
                 );
 
                 if (cartItems == null || !cartItems.Any())
@@ -375,81 +381,74 @@ namespace AccessoriesShop.Application.Services
                     return new ServiceResult<OrderResponse>
                     {
                         IsSuccess = false,
-                        Message = "Giỏ hàng của bạn đang trống."
+                        Message = "không tồn tại sản phẩm trong giỏ hàng"
                     };
                 }
-                var userIdString = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
-                    throw new Exception("Invalid ID from token");
+
                 // 3. Khởi tạo thực thể Order
                 var order = new Order
                 {
-                    AccountId = userId, 
+                    Id = Guid.NewGuid(),
+                    AccountId = userId,
                     OrderDate = DateTime.UtcNow,
                     Status = OrderStatus.Pending,
                     OrderItems = new List<OrderItem>()
                 };
 
-                // 4. Lặp qua danh sách giỏ hàng để kiểm tra kho và tạo OrderItem
+                // 4. Duyệt qua các item đã chọn để kiểm tra kho và tạo OrderItem
                 foreach (var cartItem in cartItems)
                 {
                     var variant = cartItem.ProductVariant;
 
-                    // Kiểm tra tồn kho ngay lập tức
                     if (variant == null || variant.StockQuantity < cartItem.Quantity)
                     {
                         return new ServiceResult<OrderResponse>
                         {
                             IsSuccess = false,
-                            Message = $"sản phẩm{variant?.Name} không đủ hàng tồn kho"
+                            Message = $"Sản phẩm '{variant?.Name}' không đủ hàng tồn kho."
                         };
                     }
 
-                    // Tạo OrderItem (Snapshot giá tại thời điểm mua)
-                    var orderItem = new OrderItem
+                    order.OrderItems.Add(new OrderItem
                     {
                         OrderId = order.Id,
                         VariantId = cartItem.ProductVariantId,
                         Quantity = cartItem.Quantity,
-                        Price = variant.Price // Chốt giá từ DB vào OrderItem
-                    };
-
-                    order.OrderItems.Add(orderItem);
+                        Price = variant.Price // Chốt giá tại thời điểm mua
+                    });
                 }
 
-                // 5. Tính tổng tiền và lưu Đơn hàng
+                // 5. Tính tổng tiền và lưu Order
                 order.CalculateTotalAmount();
                 await _unitOfWork.Orders.AddAsync(order);
 
-                // 6. XÓA GIỎ HÀNG (Dọn dẹp sau khi đã tạo Order xong)
+                // 6. Xóa các CartItem đã được chọn ra khỏi giỏ hàng
                 _unitOfWork.CartItems.RemoveRange(cartItems);
 
-                // 7. Lưu tất cả thay đổi vào DB lần 1 (Để lấy ID và chốt dữ liệu)
+                // 7. Lưu thay đổi tạm thời xuống DB
                 await _unitOfWork.SaveChangesAsync();
 
-                // 8. Gọi dịch vụ giữ chỗ kho (Giống hàm Create cũ của bạn)
+                // 8. Gọi dịch vụ giữ chỗ kho (Trừ StockQuantity)
                 var stockReservationResult = await _stockReservationService.ReserveStockAsync(order.Id);
                 if (!stockReservationResult.IsSuccess)
                 {
-                    // Stock reservation failed - delete the order
                     await _unitOfWork.Orders.DeleteAsync(order.Id);
                     await _unitOfWork.SaveChangesAsync();
-
                     _logger.LogWarning($"Stock reservation failed for order {order.Id}. Order deleted. Reason: {stockReservationResult.Message}");
                     return new ServiceResult<OrderResponse>
+
                     {
                         IsSuccess = false,
                         Message = $"Order creation failed: {stockReservationResult.Message}"
                     };
                 }
-
-                var createdOrder = await _unitOfWork.Orders.GetByIdAsync(order.Id);
+                var createdOrder = await _unitOfWork.Orders.GetAsync(o => o.Id == order.Id, include: q => q.Include(o => o.OrderItems));
                 var response = _mapper.Map<OrderResponse>(createdOrder);
                 if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
                 {
                     response.Items = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
-                }
 
+                }
                 return new ServiceResult<OrderResponse>
                 {
                     IsSuccess = true,
