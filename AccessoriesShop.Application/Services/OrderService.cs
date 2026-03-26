@@ -41,7 +41,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Orders.GetByIdAsync(id);
+                var entity = await _unitOfWork.Orders.GetAsync(e => e.Id == id, include: q => q.Include(e => e.OrderItems));
                 if (entity == null)
                 {
                     return new ServiceResult<OrderResponse>
@@ -79,7 +79,8 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.Orders.GetAllAsync(null);
+                var entities = await _unitOfWork.Orders.GetAllAsync(null, include : q => q.Include(e => e.OrderItems));
+
                 var responseList = new List<OrderResponse>();
 
                 foreach (var entity in entities)

@@ -230,7 +230,7 @@ namespace AccessoriesShop.Application.Services
                     };
                 }
 
-                await _unitOfWork.CartItems.DeleteAsync(id);
+                await _unitOfWork.CartItems.RemoveByIdAsync(id);
                 await _unitOfWork.SaveChangesAsync();
 
                 return new ServiceResult<string>
