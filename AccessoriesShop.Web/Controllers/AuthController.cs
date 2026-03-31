@@ -1,4 +1,4 @@
-﻿using AccessoriesShop.Application.IServices;
+﻿using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

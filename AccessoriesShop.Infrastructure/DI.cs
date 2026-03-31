@@ -1,8 +1,8 @@
-﻿using AccessoriesShop.Application;
+﻿using AccessoriesShop.Application.Interfaces;
 using AccessoriesShop.Application.Common.Settings;
-using AccessoriesShop.Application.IAuthentication;
-using AccessoriesShop.Application.IRepositories;
-using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Interfaces.Authentication;
+using AccessoriesShop.Application.Interfaces.Repositories;
+using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.Services;
 using AccessoriesShop.Infrastructure.Authentication;
 using AccessoriesShop.Infrastructure.Repositories;
@@ -34,9 +34,10 @@ namespace AccessoriesShop.Infrastructure
             });
 
             //  đăng ký settings (DI đang ko chạy)
-            services.Configure<PayOSSettings>(configuration.GetSection("PayOSSettings"));
-            services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
-            services.Configure<ClientSettings>(configuration.GetSection("ClientSettings"));
+            services.Configure<PayOSSettings>(configuration.GetSection(PayOSSettings.SectionName));
+            services.Configure<MailSettings>(configuration.GetSection(MailSettings.SectionName));
+            services.Configure<ClientSettings>(configuration.GetSection(ClientSettings.SectionNam));
+            services.Configure<GroqSettings>(configuration.GetSection(GroqSettings.SectionName));
             // Đăng ký repositiries
             #region Repositories
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -78,6 +79,7 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<IStockReservationService, StockReservationService>();
             services.AddScoped<ICartItemService, CartItemService>();
             services.AddScoped<ICustomOrderService, CustomOrderService>();
+            services.AddScoped<IAIVisionService, GroqService>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -96,6 +98,9 @@ namespace AccessoriesShop.Infrastructure
 
             //đăng ký HttpContextAccessor
             services.AddHttpContextAccessor();
+
+            // Đăng ký HttpClient cho Groq
+            services.AddHttpClient("Groq");
             return services;
         }
     }

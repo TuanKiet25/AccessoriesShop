@@ -1,7 +1,7 @@
-﻿using AccessoriesShop.Application;
+﻿using AccessoriesShop.Application.Interfaces;
 using AccessoriesShop.Application.Common.Constants;
 using AccessoriesShop.Application.Common.Settings;
-using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Constants;

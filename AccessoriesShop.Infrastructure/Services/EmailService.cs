@@ -1,5 +1,5 @@
 using AccessoriesShop.Application.Common.Settings;
-using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Interfaces.Services;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
@@ -26,12 +26,6 @@ namespace AccessoriesShop.Infrastructure.Services
             var email = _mailSettings.Email!;
             var password = _mailSettings.Password!;
             var displayname = _mailSettings.DisplayName!;
-
-            //var host = _configuration["MailSettings:Host"]!;
-            //var port = int.Parse(_configuration["MailSettings:Port"]!);
-            //var email = _configuration["MailSettings:Email"]!;
-            //var password = _configuration["MailSettings:Password"]!;
-            //var displayname = _configuration["MailSettings:DisplayName"]!;
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(displayname, email));
