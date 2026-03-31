@@ -27,6 +27,13 @@ namespace AccessoriesShop.Web.Controllers
             return HandleResult(response);
         }
 
+        [HttpPost("register-with-role")]
+        public async Task<IActionResult> RegisterWithRole([FromBody] RegisterWithRoleRequest request)
+        {
+            var response = await _authService.RegisterWithRoleAsync(request);
+            return HandleResult(response);
+        }
+
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
         {
