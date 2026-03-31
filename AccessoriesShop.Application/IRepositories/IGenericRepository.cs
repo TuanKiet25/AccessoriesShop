@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.Interfaces.Repositories
+namespace AccessoriesShop.Application.Repositories
 {
     public interface IGenericRepository<T> where T : class
     {

@@ -1,5 +1,5 @@
 ﻿using AccessoriesShop.Application.Interfaces;
-using AccessoriesShop.Application.Interfaces.Repositories;
+using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;

@@ -1,6 +1,6 @@
 using AccessoriesShop.Domain.Entities;
 
-namespace AccessoriesShop.Application.Interfaces.Repositories
+namespace AccessoriesShop.Application.Repositories
 {
     public interface ICustomOrderRepository : IGenericRepository<CustomOrder>
     {

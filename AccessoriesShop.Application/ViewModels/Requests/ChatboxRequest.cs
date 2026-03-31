@@ -38,23 +38,11 @@ namespace AccessoriesShop.Application.ViewModels.Requests
         /// </summary>
         /// <example>vi</example>
         [StringLength(5)]
-        public string Language { get; set; } = "vi";
-
-        /// <summary>
-        /// Type of plant (optional, helps improve context)
-        /// </summary>
-        /// <example>Monstera Deliciosa</example>
-        [StringLength(100)]
-        public string? PlantType { get; set; }
-
-        /// <summary>
-        /// Include product recommendations in response (default: true)
-        /// </summary>
-        public bool IncludeProductRecommendations { get; set; } = true;
+        public string? Language { get; set; } = "vi";
 
         /// <summary>
         /// Skip cache and force AI call (default: false)
         /// </summary>
-        public bool SkipCache { get; set; } = false;
+        public bool? SkipCache { get; set; } = false;
     }
 }

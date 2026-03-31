@@ -1,5 +1,3 @@
-using AccessoriesShop.Application.Interfaces.Authentication;
-using AccessoriesShop.Application.Interfaces;
 using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
@@ -7,6 +5,7 @@ using AccessoriesShop.Domain.Entities;
 using AutoMapper;
 using System;
 using System.Threading.Tasks;
+using AccessoriesShop.Application.Authentication;
 
 namespace AccessoriesShop.Application.Services
 {

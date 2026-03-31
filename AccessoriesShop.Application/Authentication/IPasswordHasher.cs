@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.Interfaces.Authentication
+namespace AccessoriesShop.Application.Authentication
 {
     public interface IPasswordHasher
     {

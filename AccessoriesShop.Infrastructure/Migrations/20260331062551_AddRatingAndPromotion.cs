@@ -10,6 +10,13 @@ namespace AccessoriesShop.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<bool>(
+                name: "IsPercentage",
+                table: "Promotions",
+                type: "boolean",
+                nullable: false,
+                defaultValue: false);
+
             migrationBuilder.AddCheckConstraint(
                 name: "CK_Promotions_PercentageRange",
                 table: "Promotions",
@@ -21,6 +28,10 @@ namespace AccessoriesShop.Infrastructure.Migrations
         {
             migrationBuilder.DropCheckConstraint(
                 name: "CK_Promotions_PercentageRange",
+                table: "Promotions");
+
+            migrationBuilder.DropColumn(
+                name: "IsPercentage",
                 table: "Promotions");
         }
     }

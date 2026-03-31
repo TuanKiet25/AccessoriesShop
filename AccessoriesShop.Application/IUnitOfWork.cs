@@ -1,6 +1,6 @@
-using AccessoriesShop.Application.Interfaces.Repositories;
+using AccessoriesShop.Application.Repositories;
 
-namespace AccessoriesShop.Application.Interfaces
+namespace AccessoriesShop.Application
 {
     public interface IUnitOfWork
     {

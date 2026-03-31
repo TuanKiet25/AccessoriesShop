@@ -1,5 +1,5 @@
-using AccessoriesShop.Application.Interfaces;
-using AccessoriesShop.Application.Interfaces.Repositories;
+using AccessoriesShop.Application;
+using AccessoriesShop.Application.Repositories;
 
 namespace AccessoriesShop.Infrastructure
 {

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.IRepositories
+namespace AccessoriesShop.Application.Repositories
 {
-	public interface IRatingRepository : IGenericRepository<Rating>
-	{
-	}
+    public interface IAccountRepository : IGenericRepository<Account>
+    {
+    }
 }

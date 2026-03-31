@@ -1,4 +1,4 @@
-using AccessoriesShop.Application.Interfaces.Repositories;
+using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Domain.Entities;
 
 namespace AccessoriesShop.Infrastructure.Repositories

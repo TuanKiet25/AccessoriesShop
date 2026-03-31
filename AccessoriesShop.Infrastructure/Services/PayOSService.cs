@@ -1,5 +1,4 @@
-﻿using AccessoriesShop.Application.Interfaces;
-using AccessoriesShop.Application.Common.Constants;
+﻿using AccessoriesShop.Application.Common.Constants;
 using AccessoriesShop.Application.Common.Settings;
 using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Requests;
@@ -14,6 +13,7 @@ using PayOS;
 using PayOS.Models.V2.PaymentRequests;
 using PayOS.Models.Webhooks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using AccessoriesShop.Application;
 
 namespace AccessoriesShop.Infrastructure.Services
 {

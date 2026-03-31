@@ -136,62 +136,62 @@ namespace AccessoriesShop.Infrastructure.Seeding
             // 1. Seed Categories (parent first)
             var categories = SeedCategories();
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Categories seeded");
+            Console.WriteLine("    Categories seeded");
 
             // 2. Seed Brands
             var brands = SeedBrands();
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Brands seeded");
+            Console.WriteLine("    Brands seeded");
 
             // 3. Seed Devices
             var devices = SeedDevices();
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Devices seeded");
+            Console.WriteLine("    Devices seeded");
 
             // 4. Seed Attributes
             var attributes = SeedAttributes();
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Attributes seeded");
+            Console.WriteLine("    Attributes seeded");
 
             // 5. Seed Accounts
             var accounts = SeedAccounts();
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Accounts seeded");
+            Console.WriteLine("   Accounts seeded");
 
             // 6. Seed Products
             var products = SeedProducts(brands, categories);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Products seeded");
+            Console.WriteLine("    Products seeded");
 
             // 7. Seed ProductVariants
             var variants = SeedProductVariants(products);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Product Variants seeded");
+            Console.WriteLine("    Product Variants seeded");
 
             // 8. Seed ProductAttributes
             SeedProductAttributes(products, attributes);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Product Attributes seeded");
+            Console.WriteLine("    Product Attributes seeded");
 
             // 9. Seed ProductCompatibilities
             SeedProductCompatibilities(products, devices);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Product Compatibilities seeded");
+            Console.WriteLine("    Product Compatibilities seeded");
 
             // 10. Seed Orders
             var orders = SeedOrders(accounts);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Orders seeded");
+            Console.WriteLine("    Orders seeded");
 
             // 11. Seed OrderItems
             SeedOrderItems(orders, variants);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Order Items seeded");
+            Console.WriteLine("    Order Items seeded");
 
             // 12. Seed Payments
             SeedPayments(orders);
             await _context.SaveChangesAsync();
-            Console.WriteLine("   ✓ Payments seeded");
+            Console.WriteLine("    Payments seeded");
         }
 
         private List<Category> SeedCategories()

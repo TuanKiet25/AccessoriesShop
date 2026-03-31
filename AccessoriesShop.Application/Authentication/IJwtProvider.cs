@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.Interfaces.Repositories
+namespace AccessoriesShop.Application.Authentication
 {
-    public interface IAccountRepository : IGenericRepository<Account>
+    public interface IJwtProvider
     {
+        string Generate(Account account);
     }
 }

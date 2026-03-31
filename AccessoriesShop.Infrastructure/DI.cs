@@ -1,20 +1,18 @@
-﻿using AccessoriesShop.Application.Interfaces;
+﻿using AccessoriesShop.Application;
+using AccessoriesShop.Application.Authentication;
 using AccessoriesShop.Application.Common.Settings;
-using AccessoriesShop.Application.Interfaces.Authentication;
-using AccessoriesShop.Application.Interfaces.Repositories;
+using AccessoriesShop.Application.Interfaces.External;
 using AccessoriesShop.Application.Interfaces.Services;
+using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Application.Services;
+using AccessoriesShop.Application.Services.AIServices;
 using AccessoriesShop.Infrastructure.Authentication;
 using AccessoriesShop.Infrastructure.Repositories;
 using AccessoriesShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccessoriesShop.Infrastructure
 {
@@ -86,7 +84,6 @@ namespace AccessoriesShop.Infrastructure
 			#endregion
 			//Đăng ký auto mapper
 			services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddScoped<IAIVisionService, GroqService>();
 
             // Đăng ký CORS
             services.AddCors(options =>
@@ -106,6 +103,12 @@ namespace AccessoriesShop.Infrastructure
 
             // Đăng ký HttpClient cho Groq
             services.AddHttpClient("Groq");
+
+            // Đăng ký AI services
+            services.AddScoped<IAIProvider, GroqService>();
+            services.AddScoped<IAIIntegrationService, AIIntegrationService>();
+            services.AddScoped<IChatboxService, ChatboxService>();
+
             return services;
         }
     }
