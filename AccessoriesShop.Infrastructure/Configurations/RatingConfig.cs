@@ -15,19 +15,22 @@ namespace AccessoriesShop.Infrastructure.Configurations
 		{
 			builder.ToTable("Ratings", t =>
 			{
-                t.HasCheckConstraint("CK_Ratings_Star", "\"Star\" BETWEEN 1 AND 5");
-            });
+				t.HasCheckConstraint("CK_Ratings_Star", "\"Star\" BETWEEN 1 AND 5");
+			});
 
 			builder.HasKey(x => x.Id);
+
+			builder.Property(x => x.ProductId)
+				.IsRequired();
+
+			builder.Property(x => x.AccountId)
+				.IsRequired();
 
 			builder.Property(x => x.Star)
 				.IsRequired();
 
 			builder.Property(x => x.Comment)
 				.HasMaxLength(1000);
-
-			builder.Property(x => x.IsVisible)
-				.HasDefaultValue(true);
 
 			builder.Property(x => x.CreatedAt)
 				.HasDefaultValueSql("NOW()");

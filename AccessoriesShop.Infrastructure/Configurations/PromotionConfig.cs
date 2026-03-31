@@ -13,33 +13,37 @@ namespace AccessoriesShop.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Promotion> builder)
 		{
-            builder.ToTable("Promotions", t =>
-            {
-                t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" >= 0");
-                t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
-            });
-            builder.HasKey(x => x.Id);
+			builder.ToTable("Promotions", t =>
+			{
+				t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" > 0");
+				t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
+				t.HasCheckConstraint(
+					"CK_Promotions_PercentageRange",
+					"\"IsPercentage\" = FALSE OR (\"DiscountValue\" >= 0 AND \"DiscountValue\" <= 100)"
+				);
+			});
+
+			builder.HasKey(x => x.Id);
+
+			builder.Property(x => x.ProductId)
+				.IsRequired();
 
 			builder.Property(x => x.Name)
 				.IsRequired()
 				.HasMaxLength(200);
 
-			builder.Property(x => x.Description)
-				.HasMaxLength(1000);
-
-			builder.Property(x => x.DiscountType)
-				.IsRequired()
-				.HasMaxLength(50);
-
 			builder.Property(x => x.DiscountValue)
 				.HasColumnType("decimal(18,2)")
 				.IsRequired();
 
-			builder.Property(x => x.MaxDiscountAmount)
-				.HasColumnType("decimal(18,2)");
+			builder.Property(x => x.IsPercentage)
+				.IsRequired();
 
-			builder.Property(x => x.MinOrderValue)
-				.HasColumnType("decimal(18,2)");
+			builder.Property(x => x.StartDate)
+				.IsRequired();
+
+			builder.Property(x => x.EndDate)
+				.IsRequired();
 
 			builder.Property(x => x.IsActive)
 				.HasDefaultValue(true);
@@ -48,8 +52,6 @@ namespace AccessoriesShop.Infrastructure.Configurations
 				.WithMany(x => x.Promotions)
 				.HasForeignKey(x => x.ProductId)
 				.OnDelete(DeleteBehavior.Cascade);
-
-            
-        }
+		}
 	}
 }

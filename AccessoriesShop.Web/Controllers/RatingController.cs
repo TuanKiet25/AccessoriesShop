@@ -6,7 +6,8 @@ using System.Security.Claims;
 
 namespace AccessoriesShop.Web.Controllers
 {
-	[Route("api/ratings")]
+	[Route("api/rating")]
+	[ApiController]
 	public class RatingController : MyBaseController
 	{
 		private readonly IRatingService _ratingService;
@@ -16,21 +17,39 @@ namespace AccessoriesShop.Web.Controllers
 			_ratingService = ratingService;
 		}
 
-		[Authorize]
-		[HttpPost]
-		public async Task<IActionResult> CreateOrUpdate([FromBody] CreateRatingRequest request)
+		[HttpGet("get-all")]
+		public async Task<IActionResult> GetAll()
 		{
-			var accountId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			await _ratingService.CreateOrUpdateAsync(accountId, request);
-			return Ok(new { message = "Rating saved successfully" });
+			var response = await _ratingService.GetAllAsync();
+			return HandleResult(response);
 		}
 
-		[HttpGet("product/{productId:guid}/summary")]
-		public async Task<IActionResult> GetSummary(Guid productId)
+		[HttpGet("get-by-id/{id}")]
+		public async Task<IActionResult> GetById(Guid id)
 		{
-			var average = await _ratingService.GetAverageAsync(productId);
-			var total = await _ratingService.GetTotalAsync(productId);
-			return Ok(new { productId, averageRating = average, totalRatings = total });
+			var response = await _ratingService.GetByIdAsync(id);
+			return HandleResult(response);
+		}
+
+		[HttpPost("create")]
+		public async Task<IActionResult> Create([FromBody] CreateRatingRequest request)
+		{
+			var response = await _ratingService.CreateAsync(request);
+			return HandleResult(response);
+		}
+
+		[HttpPut("update/{id}")]
+		public async Task<IActionResult> Update(Guid id, [FromBody] UpdateRatingRequest request)
+		{
+			var response = await _ratingService.UpdateAsync(id, request);
+			return HandleResult(response);
+		}
+
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			var response = await _ratingService.DeleteAsync(id);
+			return HandleResult(response);
 		}
 	}
 }

@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AccessoriesShop.Web.Controllers
 {
-	[Route("api/promotions")]
+	[Route("api/promotion")]
+	[ApiController]
 	public class PromotionController : MyBaseController
 	{
 		private readonly IPromotionService _promotionService;
@@ -15,19 +16,39 @@ namespace AccessoriesShop.Web.Controllers
 			_promotionService = promotionService;
 		}
 
-		[Authorize]
-		[HttpPost]
-		public async Task<IActionResult> Create([FromBody] CreatePromotionRequest request)
+		[HttpGet("get-all")]
+		public async Task<IActionResult> GetAll()
 		{
-			await _promotionService.CreateAsync(request);
-			return Ok(new { message = "Promotion created successfully" });
+			var response = await _promotionService.GetAllAsync();
+			return HandleResult(response);
 		}
 
-		[HttpGet("product/{productId:guid}/active")]
-		public async Task<IActionResult> GetActive(Guid productId)
+		[HttpGet("get-by-id/{id}")]
+		public async Task<IActionResult> GetById(Guid id)
 		{
-			var promotion = await _promotionService.GetActiveByProductIdAsync(productId);
-			return Ok(promotion);
+			var response = await _promotionService.GetByIdAsync(id);
+			return HandleResult(response);
+		}
+
+		[HttpPost("create")]
+		public async Task<IActionResult> Create([FromBody] CreatePromotionRequest request)
+		{
+			var response = await _promotionService.CreateAsync(request);
+			return HandleResult(response);
+		}
+
+		[HttpPut("update/{id}")]
+		public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePromotionRequest request)
+		{
+			var response = await _promotionService.UpdateAsync(id, request);
+			return HandleResult(response);
+		}
+
+		[HttpDelete("delete/{id}")]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			var response = await _promotionService.DeleteAsync(id);
+			return HandleResult(response);
 		}
 	}
 }

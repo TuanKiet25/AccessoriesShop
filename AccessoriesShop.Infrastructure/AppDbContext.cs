@@ -30,15 +30,13 @@ namespace AccessoriesShop.Infrastructure
         public virtual DbSet<ProductCompatibility> ProductCompatibilities { get; set; }
         public virtual DbSet<CustomOrder> CustomOrders { get; set; }
         public virtual DbSet<CustomOrderFile> CustomOrderFiles { get; set; }
-		public DbSet<Rating> Ratings { get; set; }
-		public DbSet<Promotion> Promotions { get; set; }
+		public virtual DbSet<Rating> Ratings { get; set; }
+		public virtual DbSet<Promotion> Promotions { get; set; }
 		#endregion
 		protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-			builder.ApplyConfiguration(new RatingConfig());
-			builder.ApplyConfiguration(new PromotionConfig());
 		}
     }
 }

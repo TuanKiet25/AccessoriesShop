@@ -23,9 +23,11 @@ namespace AccessoriesShop.Infrastructure
         public ICartItemRepository CartItems { get; }
         public ICartRepository Carts { get; }
         public ICustomOrderRepository CustomOrders { get; }
+        public IRatingRepository Ratings { get; }
+		public IPromotionRepository Promotions { get; }
         public IAddressRepository Addresses { get; }
 
-        public UnitOfWork(
+		public UnitOfWork(
             AppDbContext context,
             IAccountRepository accounts,
             IOrderRepository orders,
@@ -43,6 +45,8 @@ namespace AccessoriesShop.Infrastructure
             ICartItemRepository cartItems,
             ICartRepository carts,
             ICustomOrderRepository customOrders,
+			IRatingRepository ratings,
+			IPromotionRepository promotions,
             IAddressRepository addresses)
         {
             _context = context;
@@ -62,6 +66,8 @@ namespace AccessoriesShop.Infrastructure
             CartItems = cartItems;
             Carts = carts;
             CustomOrders = customOrders;
+			Ratings = ratings;
+			Promotions = promotions;
             Addresses = addresses;
         }
 

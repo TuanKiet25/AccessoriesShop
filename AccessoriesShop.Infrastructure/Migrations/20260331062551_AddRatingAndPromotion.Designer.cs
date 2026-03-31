@@ -3,6 +3,7 @@ using System;
 using AccessoriesShop.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccessoriesShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331062551_AddRatingAndPromotion")]
+    partial class AddRatingAndPromotion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,50 +70,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Address", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DistrictCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ProvinceCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("StreetAddress")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("WardCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Attributes", b =>
@@ -411,9 +370,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ShippingDetail")
-                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .HasColumnType("text");
@@ -848,17 +804,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Address", b =>
-                {
-                    b.HasOne("AccessoriesShop.Domain.Entities.Account", "Account")
-                        .WithMany("Addresses")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Cart", b =>
                 {
                     b.HasOne("AccessoriesShop.Domain.Entities.Account", "Account")
@@ -1079,8 +1024,6 @@ namespace AccessoriesShop.Infrastructure.Migrations
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Account", b =>
                 {
-                    b.Navigation("Addresses");
-
                     b.Navigation("Cart");
 
                     b.Navigation("Orders");

@@ -56,6 +56,8 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICartItemRepository, CartItemRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
+			services.AddScoped<IRatingRepository, RatingRepository>();
+            services.AddScoped<IPromotionRepository, PromotionRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             #endregion
             // Đăng ký services
@@ -79,6 +81,8 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<IStockReservationService, StockReservationService>();
             services.AddScoped<ICartItemService, CartItemService>();
             services.AddScoped<ICustomOrderService, CustomOrderService>();
+			services.AddScoped<IRatingService, RatingService>();
+			services.AddScoped<IPromotionService, PromotionService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddSingleton<ILocationService, LocationService>();
             #endregion
