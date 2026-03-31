@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.IServices
+namespace AccessoriesShop.Application.Interfaces.Services
 {
     public interface IPaymentService
     {

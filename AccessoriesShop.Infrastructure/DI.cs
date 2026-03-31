@@ -1,20 +1,19 @@
 ﻿using AccessoriesShop.Application;
+using AccessoriesShop.Application.Authentication;
 using AccessoriesShop.Application.Common.Settings;
-using AccessoriesShop.Application.IAuthentication;
+using AccessoriesShop.Application.Interfaces.External;
+using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.IRepositories;
 using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Application.Services;
+using AccessoriesShop.Application.Services.AIServices;
 using AccessoriesShop.Infrastructure.Authentication;
 using AccessoriesShop.Infrastructure.Repositories;
 using AccessoriesShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccessoriesShop.Infrastructure
 {
@@ -34,9 +33,10 @@ namespace AccessoriesShop.Infrastructure
             });
 
             //  đăng ký settings (DI đang ko chạy)
-            services.Configure<PayOSSettings>(configuration.GetSection("PayOSSettings"));
-            services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
-            services.Configure<ClientSettings>(configuration.GetSection("ClientSettings"));
+            services.Configure<PayOSSettings>(configuration.GetSection(PayOSSettings.SectionName));
+            services.Configure<MailSettings>(configuration.GetSection(MailSettings.SectionName));
+            services.Configure<ClientSettings>(configuration.GetSection(ClientSettings.SectionNam));
+            services.Configure<GroqSettings>(configuration.GetSection(GroqSettings.SectionName));
             // Đăng ký repositiries
             #region Repositories
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -58,6 +58,8 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
 			services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IPromotionRepository, PromotionRepository>();
+            services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+            services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             #endregion
             // Đăng ký services
@@ -85,6 +87,7 @@ namespace AccessoriesShop.Infrastructure
 			services.AddScoped<IPromotionService, PromotionService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddSingleton<ILocationService, LocationService>();
+            services.AddScoped<IChatRoomService, ChatRoomService>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -103,6 +106,14 @@ namespace AccessoriesShop.Infrastructure
 
             //đăng ký HttpContextAccessor
             services.AddHttpContextAccessor();
+
+            // Đăng ký HttpClient cho Groq
+            services.AddHttpClient("Groq");
+
+            // Đăng ký AI services
+            services.AddScoped<IAIProvider, GroqService>();
+            services.AddScoped<IAIIntegrationService, AIIntegrationService>();
+            services.AddScoped<IChatboxService, ChatboxService>();
 
             return services;
         }

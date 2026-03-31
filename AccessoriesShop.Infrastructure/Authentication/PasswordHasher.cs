@@ -1,4 +1,4 @@
-﻿using AccessoriesShop.Application.IAuthentication;
+﻿using AccessoriesShop.Application.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,5 @@
 using AccessoriesShop.Application;
-using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Entities;
 using Microsoft.Extensions.Logging;

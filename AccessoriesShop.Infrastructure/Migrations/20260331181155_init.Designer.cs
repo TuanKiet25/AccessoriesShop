@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccessoriesShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260331180839_init")]
+    [Migration("20260331181155_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -263,6 +263,87 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.ChatMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SenderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UserType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("ChatMessages", (string)null);
+                });
+
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.ChatRoom", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid?>("ActiveStaffId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsAIEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActiveStaffId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("ChatRooms", (string)null);
                 });
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.CustomOrder", b =>
@@ -902,6 +983,42 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.Navigation("Parent");
                 });
 
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("AccessoriesShop.Domain.Entities.ChatRoom", "Room")
+                        .WithMany("Messages")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AccessoriesShop.Domain.Entities.Account", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.ChatRoom", b =>
+                {
+                    b.HasOne("AccessoriesShop.Domain.Entities.Account", "ActiveStaff")
+                        .WithMany()
+                        .HasForeignKey("ActiveStaffId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AccessoriesShop.Domain.Entities.Account", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ActiveStaff");
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.CustomOrder", b =>
                 {
                     b.HasOne("AccessoriesShop.Domain.Entities.Account", "Account")
@@ -1113,6 +1230,11 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.Navigation("Children");
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.ChatRoom", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.CustomOrder", b =>

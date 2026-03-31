@@ -1,14 +1,9 @@
-﻿using AccessoriesShop.Application.IRepositories;
-using AccessoriesShop.Application.IServices;
+﻿using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Entities;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace AccessoriesShop.Application.Services
 {

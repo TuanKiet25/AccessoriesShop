@@ -1,6 +1,6 @@
 ﻿using AccessoriesShop.Application.Common.Constants;
 using AccessoriesShop.Application.Common.Settings;
-using AccessoriesShop.Application.IServices;
+using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;

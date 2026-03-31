@@ -2,7 +2,7 @@
 using AccessoriesShop.Application.ViewModels.Responses;
 using PayOS.Models.Webhooks;
 
-namespace AccessoriesShop.Application.IServices
+namespace AccessoriesShop.Application.Interfaces.Services
 {
     public interface IPayOSService
     {

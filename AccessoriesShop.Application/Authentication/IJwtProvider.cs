@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.IAuthentication
+namespace AccessoriesShop.Application.Authentication
 {
     public interface IJwtProvider
     {

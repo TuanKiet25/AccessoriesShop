@@ -1,4 +1,4 @@
-﻿using AccessoriesShop.Application.IAuthentication;
+﻿using AccessoriesShop.Application.Authentication;
 using AccessoriesShop.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

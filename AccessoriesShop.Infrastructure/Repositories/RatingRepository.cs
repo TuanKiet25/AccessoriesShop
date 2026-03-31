@@ -1,11 +1,6 @@
-﻿using AccessoriesShop.Application.IRepositories;
+﻿using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace AccessoriesShop.Infrastructure.Repositories
 {

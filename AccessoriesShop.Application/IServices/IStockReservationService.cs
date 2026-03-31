@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Application.IServices
+namespace AccessoriesShop.Application.Interfaces.Services
 {
     /// <summary>
     /// Service for managing stock reservations during order lifecycle

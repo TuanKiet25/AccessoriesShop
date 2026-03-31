@@ -1,7 +1,7 @@
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
 
-namespace AccessoriesShop.Application.IServices
+namespace AccessoriesShop.Application.Interfaces.Services
 {
     public interface IProductService
     {

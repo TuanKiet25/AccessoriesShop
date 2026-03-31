@@ -9,6 +9,7 @@ namespace AccessoriesShop.Domain.Enums
     public enum Role
     {
         Admin,
-        User
+        User,
+        Staff
     }
 }

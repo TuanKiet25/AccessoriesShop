@@ -1,4 +1,5 @@
 using AccessoriesShop.Application.IRepositories;
+using AccessoriesShop.Application.Repositories;
 
 namespace AccessoriesShop.Application
 {
@@ -23,6 +24,8 @@ namespace AccessoriesShop.Application
 		IRatingRepository Ratings { get; }
 		IPromotionRepository Promotions { get; }
         IAddressRepository Addresses { get; }
+        IChatRoomRepository ChatRooms { get; }
+        IChatMessageRepository ChatMessages { get; }
         Task<int> SaveChangesAsync();
     }
 }

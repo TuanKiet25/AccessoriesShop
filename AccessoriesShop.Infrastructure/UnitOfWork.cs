@@ -1,5 +1,6 @@
 using AccessoriesShop.Application;
 using AccessoriesShop.Application.IRepositories;
+using AccessoriesShop.Application.Repositories;
 
 namespace AccessoriesShop.Infrastructure
 {
@@ -26,6 +27,8 @@ namespace AccessoriesShop.Infrastructure
         public IRatingRepository Ratings { get; }
 		public IPromotionRepository Promotions { get; }
         public IAddressRepository Addresses { get; }
+        public IChatRoomRepository ChatRooms { get; }
+        public IChatMessageRepository ChatMessages { get; }
 
 		public UnitOfWork(
             AppDbContext context,
@@ -47,7 +50,9 @@ namespace AccessoriesShop.Infrastructure
             ICustomOrderRepository customOrders,
 			IRatingRepository ratings,
 			IPromotionRepository promotions,
-            IAddressRepository addresses)
+            IAddressRepository addresses,
+            IChatRoomRepository chatRooms,
+            IChatMessageRepository chatMessages)
         {
             _context = context;
             Accounts = accounts;
@@ -69,6 +74,8 @@ namespace AccessoriesShop.Infrastructure
 			Ratings = ratings;
 			Promotions = promotions;
             Addresses = addresses;
+            ChatRooms = chatRooms;
+            ChatMessages = chatMessages;
         }
 
         public async Task<int> SaveChangesAsync()

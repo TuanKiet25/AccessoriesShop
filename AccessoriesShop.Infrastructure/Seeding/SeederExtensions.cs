@@ -32,9 +32,9 @@ namespace AccessoriesShop.Infrastructure.Seeding
                      // your seeding option here
                      // await seeder._____
 
-                    // await seeder.SeedDatabase();
+                     //await seeder.SeedDatabase();
 
-                   
+
                 }
                 catch (Exception ex)
                 {
