@@ -3,6 +3,7 @@ using AccessoriesShop.Infrastructure.Seeding;
 using AccessoriesShop.Web.Hubs;
 using IdGen;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -85,7 +86,25 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 var app = builder.Build();
-
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        context.Database.Migrate();
+         if (app.Environment.IsDevelopment())
+         {
+        await services.SeedDatabaseAsync();
+         }
+    }
+    catch (Exception ex)
+    {
+        // Ghi lại log nếu có lỗi xảy ra trong quá trình chạy DB
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Đã xảy ra lỗi khi tự động cập nhật Database.");
+    }
+}
 // Enable request body buffering for PayOS webhook signature verification
 app.Use(async (context, next) =>
 {
@@ -94,12 +113,16 @@ app.Use(async (context, next) =>
 });
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    await app.Services.SeedDatabaseAsync(); // Chỉ seed dữ liệu khi ở môi trường Dev
-}
+    
+    options.RoutePrefix = string.Empty;
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
+
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
