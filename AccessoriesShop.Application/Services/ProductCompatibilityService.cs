@@ -22,7 +22,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.ProductCompatibilities.GetByIdAsync(id);
+                var entity = await _unitOfWork.ProductCompatibilities.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<ProductCompatibilityResponse>
@@ -68,7 +68,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.ProductCompatibilities.GetAllAsync(null);
+                var entities = await _unitOfWork.ProductCompatibilities.GetAllAsync(x => !x.isDeleted);
                 var responses = _mapper.Map<List<ProductCompatibilityResponse>>(entities);
                 
                 // Manually map ProductName and DeviceName for each item
@@ -148,7 +148,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.ProductCompatibilities.GetByIdAsync(id);
+                var entity = await _unitOfWork.ProductCompatibilities.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<ProductCompatibilityResponse>
@@ -199,7 +199,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.ProductCompatibilities.GetByIdAsync(id);
+                var entity = await _unitOfWork.ProductCompatibilities.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<string>

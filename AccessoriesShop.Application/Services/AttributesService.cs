@@ -22,7 +22,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Attributes.GetByIdAsync(id);
+                var entity = await _unitOfWork.Attributes.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<AttributesResponse>
@@ -52,7 +52,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.Attributes.GetAllAsync(null);
+                var entities = await _unitOfWork.Attributes.GetAllAsync(x => !x.isDeleted);
                 return new ServiceResult<List<AttributesResponse>>
                 {
                     IsSuccess = true,
@@ -97,7 +97,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Attributes.GetByIdAsync(id);
+                var entity = await _unitOfWork.Attributes.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<AttributesResponse>
@@ -131,7 +131,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Attributes.GetByIdAsync(id);
+                var entity = await _unitOfWork.Attributes.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<string>

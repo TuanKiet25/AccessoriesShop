@@ -3,6 +3,7 @@ using System;
 using AccessoriesShop.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccessoriesShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331050552_RatingAndPromotion")]
+    partial class RatingAndPromotion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -710,6 +713,15 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DiscountType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<decimal>("DiscountValue")
                         .HasColumnType("decimal(18,2)");
 
@@ -721,8 +733,11 @@ namespace AccessoriesShop.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<bool>("IsPercentage")
-                        .HasColumnType("boolean");
+                    b.Property<decimal?>("MaxDiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MinOrderValue")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -749,9 +764,7 @@ namespace AccessoriesShop.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
 
-                            t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" > 0");
-
-                            t.HasCheckConstraint("CK_Promotions_PercentageRange", "\"IsPercentage\" = FALSE OR (\"DiscountValue\" >= 0 AND \"DiscountValue\" <= 100)");
+                            t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" >= 0");
                         });
                 });
 
@@ -776,6 +789,11 @@ namespace AccessoriesShop.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
+                    b.Property<bool>("IsVisible")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
@@ -783,6 +801,9 @@ namespace AccessoriesShop.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("isDeleted")

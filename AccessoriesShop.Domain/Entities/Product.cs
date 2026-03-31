@@ -19,6 +19,8 @@ namespace AccessoriesShop.Domain.Entities
         public List<ProductVariant>? Variants { get; set; }
         public List<ProductAttribute>? productAttributes { get; set; }
         public List<ProductCompatibility>? productCompatibilities { get; set; }
+		public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
+		public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
 
-    }
+	}
 }

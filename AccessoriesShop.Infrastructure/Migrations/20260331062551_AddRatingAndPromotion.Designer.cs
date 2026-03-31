@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccessoriesShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260326030907_NewMigration")]
-    partial class NewMigration
+    [Migration("20260331062551_AddRatingAndPromotion")]
+    partial class AddRatingAndPromotion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -704,6 +704,106 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.ToTable("ProductVariants");
                 });
 
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Promotion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsPercentage")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Promotions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
+
+                            t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" > 0");
+
+                            t.HasCheckConstraint("CK_Promotions_PercentageRange", "\"IsPercentage\" = FALSE OR (\"DiscountValue\" >= 0 AND \"DiscountValue\" <= 100)");
+                        });
+                });
+
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Rating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Star")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("ProductId", "AccountId")
+                        .IsUnique();
+
+                    b.ToTable("Ratings", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Ratings_Star", "\"Star\" BETWEEN 1 AND 5");
+                        });
+                });
+
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Cart", b =>
                 {
                     b.HasOne("AccessoriesShop.Domain.Entities.Account", "Account")
@@ -892,6 +992,36 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Promotion", b =>
+                {
+                    b.HasOne("AccessoriesShop.Domain.Entities.Product", "Product")
+                        .WithMany("Promotions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("AccessoriesShop.Domain.Entities.Rating", b =>
+                {
+                    b.HasOne("AccessoriesShop.Domain.Entities.Account", "Account")
+                        .WithMany("Ratings")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccessoriesShop.Domain.Entities.Product", "Product")
+                        .WithMany("Ratings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Account", b =>
                 {
                     b.Navigation("Cart");
@@ -899,6 +1029,8 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("OtpVerifications");
+
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Attributes", b =>
@@ -942,6 +1074,10 @@ namespace AccessoriesShop.Infrastructure.Migrations
 
             modelBuilder.Entity("AccessoriesShop.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("Promotions");
+
+                    b.Navigation("Ratings");
+
                     b.Navigation("Variants");
 
                     b.Navigation("productAttributes");
