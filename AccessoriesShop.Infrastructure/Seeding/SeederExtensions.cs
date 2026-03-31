@@ -1,5 +1,6 @@
 using AccessoriesShop.Infrastructure;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -29,12 +30,10 @@ namespace AccessoriesShop.Infrastructure.Seeding
 
                 try
                 {
-                     // your seeding option here
-                     // await seeder._____
-
-                    // await seeder.SeedDatabase();
-
-                   
+                    if (!await context.Accounts.AnyAsync() && !await context.Products.AnyAsync())
+                    {
+                        await seeder.SeedDatabase();
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -12,6 +12,7 @@ namespace AccessoriesShop.Application.IServices
     {
         Task<ServiceResult<OrderResponse>> GetByIdAsync(Guid id);
         Task<ServiceResult<List<OrderResponse>>> GetAllAsync();
+        Task<ServiceResult<List<OrderResponse>>> GetMyOrdersAsync(Guid accountId);
         Task<ServiceResult<OrderResponse>> CreateAsync(CreateOrderRequest request);
         Task<ServiceResult<OrderResponse>> UpdateAsync(Guid id, CreateOrderRequest request);
         Task<ServiceResult<string>> DeleteAsync(Guid id);

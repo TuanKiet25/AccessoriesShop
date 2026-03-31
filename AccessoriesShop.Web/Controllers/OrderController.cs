@@ -30,16 +30,15 @@ namespace AccessoriesShop.Web.Controllers
             return HandleResult(response);
         }
 
-        [HttpPost("get-my")]
-        public async Task<IActionResult> GetMy([FromBody] CreateOrderRequest request)
+        [HttpGet("get-my")]
+        public async Task<IActionResult> GetMy()
         {
             var userId = GetUserId(User);
             if (userId == Guid.Empty)
             {
                 return BadRequest("User not authenticated.");
             }
-            request.AccountId = userId;
-            var response = await _orderService.CreateAsync( request);
+            var response = await _orderService.GetMyOrdersAsync(userId);
             return HandleResult(response);
         }
 

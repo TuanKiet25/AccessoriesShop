@@ -4,6 +4,7 @@ using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Constants;
 using AccessoriesShop.Domain.Entities;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,9 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.Orders.GetByIdAsync(id);
+                var entity = await _unitOfWork.Orders.GetAsync(
+                    o => o.Id == id,
+                    include: q => q.Include(o => o.OrderItems));
                 if (entity == null)
                 {
                     return new ServiceResult<OrderResponse>
@@ -74,7 +77,9 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.Orders.GetAllAsync(null);
+                var entities = await _unitOfWork.Orders.GetAllAsync(
+                    null,
+                    include: q => q.Include(o => o.OrderItems));
                 var responseList = new List<OrderResponse>();
 
                 foreach (var entity in entities)
@@ -96,6 +101,42 @@ namespace AccessoriesShop.Application.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Error getting all orders: {ex.Message}");
+                return new ServiceResult<List<OrderResponse>>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ServiceResult<List<OrderResponse>>> GetMyOrdersAsync(Guid accountId)
+        {
+            try
+            {
+                var entities = await _unitOfWork.Orders.GetAllAsync(
+                    o => o.AccountId == accountId && !o.isDeleted,
+                    include: q => q.Include(o => o.OrderItems));
+
+                var responseList = new List<OrderResponse>();
+                foreach (var entity in entities)
+                {
+                    var response = _mapper.Map<OrderResponse>(entity);
+                    if (entity.OrderItems != null && entity.OrderItems.Count > 0)
+                    {
+                        response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                    }
+                    responseList.Add(response);
+                }
+
+                return new ServiceResult<List<OrderResponse>>
+                {
+                    IsSuccess = true,
+                    Data = responseList
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error getting my orders: {ex.Message}");
                 return new ServiceResult<List<OrderResponse>>
                 {
                     IsSuccess = false,
@@ -200,7 +241,9 @@ namespace AccessoriesShop.Application.Services
                 }
 
                 // Reload the order to get all related data
-                var createdOrder = await _unitOfWork.Orders.GetByIdAsync(entity.Id);
+                var createdOrder = await _unitOfWork.Orders.GetAsync(
+                    o => o.Id == entity.Id,
+                    include: q => q.Include(o => o.OrderItems));
                 var response = _mapper.Map<OrderResponse>(createdOrder);
                 if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
                 {

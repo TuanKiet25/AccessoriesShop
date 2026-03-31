@@ -22,6 +22,13 @@ namespace AccessoriesShop.Web.Controllers
             return HandleResult(response);
         }
 
+        [HttpGet("get-by-product/{productId}")]
+        public async Task<IActionResult> GetByProduct(Guid productId)
+        {
+            var response = await _productVariantService.GetByProductIdAsync(productId);
+            return HandleResult(response);
+        }
+
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

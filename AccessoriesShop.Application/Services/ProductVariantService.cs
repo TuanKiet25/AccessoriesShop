@@ -89,6 +89,38 @@ namespace AccessoriesShop.Application.Services
             }
         }
 
+        public async Task<ServiceResult<List<ProductVariantResponse>>> GetByProductIdAsync(Guid productId)
+        {
+            try
+            {
+                var entities = await _unitOfWork.ProductVariants.GetAllAsync(v => v.ProductId == productId && !v.isDeleted);
+                var responses = _mapper.Map<List<ProductVariantResponse>>(entities);
+
+                foreach (var response in responses)
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(response.ProductId);
+                    if (product != null)
+                    {
+                        response.ProductName = product.Name;
+                    }
+                }
+
+                return new ServiceResult<List<ProductVariantResponse>>
+                {
+                    IsSuccess = true,
+                    Data = responses
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<List<ProductVariantResponse>>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
         public async Task<ServiceResult<ProductVariantResponse>> CreateAsync(CreateProductVariantRequest request)
         {
             try

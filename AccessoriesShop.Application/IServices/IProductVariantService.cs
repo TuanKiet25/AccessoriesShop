@@ -7,6 +7,7 @@ namespace AccessoriesShop.Application.IServices
     {
         Task<ServiceResult<ProductVariantResponse>> GetByIdAsync(Guid id);
         Task<ServiceResult<List<ProductVariantResponse>>> GetAllAsync();
+        Task<ServiceResult<List<ProductVariantResponse>>> GetByProductIdAsync(Guid productId);
         Task<ServiceResult<ProductVariantResponse>> CreateAsync(CreateProductVariantRequest request);
         Task<ServiceResult<ProductVariantResponse>> UpdateAsync(Guid id, CreateProductVariantRequest request);
         Task<ServiceResult<string>> DeleteAsync(Guid id);
