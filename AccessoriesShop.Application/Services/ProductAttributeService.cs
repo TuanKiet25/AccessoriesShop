@@ -68,7 +68,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entities = await _unitOfWork.ProductAttributes.GetAllAsync(null, include:
+                var entities = await _unitOfWork.ProductAttributes.GetAllAsync(x => !x.isDeleted, include:
                                                                                 q => q.Include(pa => pa.Product)
                                                                                 .Include(pa => pa.Attribute));
 
@@ -134,7 +134,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.ProductAttributes.GetByIdAsync(id);
+                var entity = await _unitOfWork.ProductAttributes.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<ProductAttributeResponse>
@@ -185,7 +185,7 @@ namespace AccessoriesShop.Application.Services
         {
             try
             {
-                var entity = await _unitOfWork.ProductAttributes.GetByIdAsync(id);
+                var entity = await _unitOfWork.ProductAttributes.GetAsync(x => x.Id == id && !x.isDeleted);
                 if (entity == null)
                 {
                     return new ServiceResult<string>

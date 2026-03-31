@@ -13,7 +13,10 @@ namespace AccessoriesShop.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Rating> builder)
 		{
-			builder.ToTable("Ratings");
+			builder.ToTable("Ratings", t =>
+			{
+                t.HasCheckConstraint("CK_Ratings_Star", "\"Star\" BETWEEN 1 AND 5");
+            });
 
 			builder.HasKey(x => x.Id);
 
@@ -27,7 +30,7 @@ namespace AccessoriesShop.Infrastructure.Configurations
 				.HasDefaultValue(true);
 
 			builder.Property(x => x.CreatedAt)
-				.HasDefaultValueSql("GETUTCDATE()");
+				.HasDefaultValueSql("NOW()");
 
 			builder.HasOne(x => x.Product)
 				.WithMany(x => x.Ratings)
@@ -41,8 +44,6 @@ namespace AccessoriesShop.Infrastructure.Configurations
 
 			builder.HasIndex(x => new { x.ProductId, x.AccountId })
 				.IsUnique();
-
-			builder.HasCheckConstraint("CK_Ratings_Star", "[Star] >= 1 AND [Star] <= 5");
 		}
 	}
 }

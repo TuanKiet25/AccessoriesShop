@@ -13,9 +13,12 @@ namespace AccessoriesShop.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Promotion> builder)
 		{
-			builder.ToTable("Promotions");
-
-			builder.HasKey(x => x.Id);
+            builder.ToTable("Promotions", t =>
+            {
+                t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" >= 0");
+                t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
+            });
+            builder.HasKey(x => x.Id);
 
 			builder.Property(x => x.Name)
 				.IsRequired()
@@ -46,8 +49,7 @@ namespace AccessoriesShop.Infrastructure.Configurations
 				.HasForeignKey(x => x.ProductId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			builder.HasCheckConstraint("CK_Promotions_DiscountValue", "[DiscountValue] >= 0");
-			builder.HasCheckConstraint("CK_Promotions_DateRange", "[EndDate] >= [StartDate]");
-		}
+            
+        }
 	}
 }

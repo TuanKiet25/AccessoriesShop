@@ -759,9 +759,9 @@ namespace AccessoriesShop.Infrastructure.Migrations
 
                     b.ToTable("Promotions", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Promotions_DateRange", "[EndDate] >= [StartDate]");
+                            t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
 
-                            t.HasCheckConstraint("CK_Promotions_DiscountValue", "[DiscountValue] >= 0");
+                            t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" >= 0");
                         });
                 });
 
@@ -784,7 +784,7 @@ namespace AccessoriesShop.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<bool>("IsVisible")
                         .ValueGeneratedOnAdd()
@@ -815,7 +815,7 @@ namespace AccessoriesShop.Infrastructure.Migrations
 
                     b.ToTable("Ratings", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Ratings_Star", "[Star] >= 1 AND [Star] <= 5");
+                            t.HasCheckConstraint("CK_Ratings_Star", "\"Star\" BETWEEN 1 AND 5");
                         });
                 });
 
