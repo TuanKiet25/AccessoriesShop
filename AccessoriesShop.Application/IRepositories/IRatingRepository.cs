@@ -9,8 +9,5 @@ namespace AccessoriesShop.Application.IRepositories
 {
 	public interface IRatingRepository : IGenericRepository<Rating>
 	{
-		Task<Rating?> GetByProductAndAccountAsync(Guid productId, Guid accountId);
-		Task<double> GetAverageRatingAsync(Guid productId);
-		Task<int> GetTotalRatingsAsync(Guid productId);
 	}
 }

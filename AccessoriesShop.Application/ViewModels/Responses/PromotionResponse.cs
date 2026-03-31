@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessoriesShop.Domain.Entities
+namespace AccessoriesShop.Application.ViewModels.Responses
 {
-	public class Promotion : BaseEntity
+	public class PromotionResponse
 	{
 		public Guid Id { get; set; }
 		public Guid ProductId { get; set; }
@@ -17,7 +16,5 @@ namespace AccessoriesShop.Domain.Entities
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
 		public bool IsActive { get; set; }
-
-		public Product Product { get; set; } = null!;
 	}
 }

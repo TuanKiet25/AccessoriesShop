@@ -1,7 +1,9 @@
 ﻿using AccessoriesShop.Application.IRepositories;
 using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.ViewModels.Requests;
+using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Entities;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,58 +14,169 @@ namespace AccessoriesShop.Application.Services
 {
 	public class PromotionService : IPromotionService
 	{
-		private readonly IPromotionRepository _promotionRepository;
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IMapper _mapper;
 
-		public PromotionService(IPromotionRepository promotionRepository, IUnitOfWork unitOfWork)
+		public PromotionService(IUnitOfWork unitOfWork, IMapper mapper)
 		{
-			_promotionRepository = promotionRepository;
 			_unitOfWork = unitOfWork;
+			_mapper = mapper;
 		}
 
-		public async Task CreateAsync(CreatePromotionRequest request)
+		public async Task<ServiceResult<IEnumerable<PromotionResponse>>> GetAllAsync()
 		{
-			var entity = new Promotion
+			try
 			{
-				ProductId = request.ProductId,
-				Name = request.Name,
-				Description = request.Description,
-				DiscountType = request.DiscountType,
-				DiscountValue = request.DiscountValue,
-				MaxDiscountAmount = request.MaxDiscountAmount,
-				MinOrderValue = request.MinOrderValue,
-				StartDate = request.StartDate,
-				EndDate = request.EndDate,
-				IsActive = true
-			};
-
-			await _promotionRepository.AddAsync(entity);
-			await _unitOfWork.SaveChangesAsync();
-		}
-
-		public Task<Promotion?> GetActiveByProductIdAsync(Guid productId)
-			=> _promotionRepository.GetActivePromotionByProductIdAsync(productId, DateTime.UtcNow);
-
-		public decimal CalculateDiscountedPrice(decimal originalPrice, Promotion? promotion)
-		{
-			if (promotion is null) return originalPrice;
-
-			decimal discount = 0;
-			if (promotion.DiscountType.Equals("Percent", StringComparison.OrdinalIgnoreCase))
-			{
-				discount = originalPrice * promotion.DiscountValue / 100m;
-				if (promotion.MaxDiscountAmount.HasValue && discount > promotion.MaxDiscountAmount.Value)
+				var entities = await _unitOfWork.Promotions.GetAllAsync(x => true);
+				return new ServiceResult<IEnumerable<PromotionResponse>>
 				{
-					discount = promotion.MaxDiscountAmount.Value;
-				}
+					IsSuccess = true,
+					Data = _mapper.Map<IEnumerable<PromotionResponse>>(entities)
+				};
 			}
-			else if (promotion.DiscountType.Equals("FixedAmount", StringComparison.OrdinalIgnoreCase))
+			catch (Exception ex)
 			{
-				discount = promotion.DiscountValue;
+				return new ServiceResult<IEnumerable<PromotionResponse>>
+				{
+					IsSuccess = false,
+					Message = ex.Message
+				};
 			}
+		}
 
-			var finalPrice = originalPrice - discount;
-			return finalPrice < 0 ? 0 : finalPrice;
+		public async Task<ServiceResult<PromotionResponse>> GetByIdAsync(Guid id)
+		{
+			try
+			{
+				var entity = await _unitOfWork.Promotions.GetByIdAsync(id);
+				if (entity == null)
+				{
+					return new ServiceResult<PromotionResponse>
+					{
+						IsSuccess = false,
+						IsNotFound = true,
+						Message = "Promotion not found."
+					};
+				}
+
+				return new ServiceResult<PromotionResponse>
+				{
+					IsSuccess = true,
+					Data = _mapper.Map<PromotionResponse>(entity)
+				};
+			}
+			catch (Exception ex)
+			{
+				return new ServiceResult<PromotionResponse>
+				{
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ServiceResult<PromotionResponse>> CreateAsync(CreatePromotionRequest request)
+		{
+			try
+			{
+				var entity = _mapper.Map<Promotion>(request);
+				entity.Id = Guid.NewGuid();
+
+				await _unitOfWork.Promotions.AddAsync(entity);
+				await _unitOfWork.SaveChangesAsync();
+
+				return new ServiceResult<PromotionResponse>
+				{
+					IsSuccess = true,
+					Data = _mapper.Map<PromotionResponse>(entity),
+					Message = "Create promotion successfully."
+				};
+			}
+			catch (Exception ex)
+			{
+				return new ServiceResult<PromotionResponse>
+				{
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ServiceResult<PromotionResponse>> UpdateAsync(Guid id, UpdatePromotionRequest request)
+		{
+			try
+			{
+				var entity = await _unitOfWork.Promotions.GetByIdAsync(id);
+				if (entity == null)
+				{
+					return new ServiceResult<PromotionResponse>
+					{
+						IsSuccess = false,
+						IsNotFound = true,
+						Message = "Promotion not found."
+					};
+				}
+
+				entity.Name = request.Name;
+				entity.DiscountValue = request.DiscountValue;
+				entity.IsPercentage = request.IsPercentage;
+				entity.StartDate = request.StartDate;
+				entity.EndDate = request.EndDate;
+				entity.IsActive = request.IsActive;
+
+				_unitOfWork.Promotions.UpdateAsync(entity);
+				await _unitOfWork.SaveChangesAsync();
+
+				return new ServiceResult<PromotionResponse>
+				{
+					IsSuccess = true,
+					Data = _mapper.Map<PromotionResponse>(entity),
+					Message = "Update promotion successfully."
+				};
+			}
+			catch (Exception ex)
+			{
+				return new ServiceResult<PromotionResponse>
+				{
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
+		}
+
+		public async Task<ServiceResult<bool>> DeleteAsync(Guid id)
+		{
+			try
+			{
+				var entity = await _unitOfWork.Promotions.GetByIdAsync(id);
+				if (entity == null)
+				{
+					return new ServiceResult<bool>
+					{
+						IsSuccess = false,
+						IsNotFound = true,
+						Message = "Promotion not found."
+					};
+				}
+
+				_unitOfWork.Promotions.RemoveByIdAsync(id);
+				await _unitOfWork.SaveChangesAsync();
+
+				return new ServiceResult<bool>
+				{
+					IsSuccess = true,
+					Data = true,
+					Message = "Delete promotion successfully."
+				};
+			}
+			catch (Exception ex)
+			{
+				return new ServiceResult<bool>
+				{
+					IsSuccess = false,
+					Message = ex.Message
+				};
+			}
 		}
 	}
 }

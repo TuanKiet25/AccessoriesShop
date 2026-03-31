@@ -9,6 +9,5 @@ namespace AccessoriesShop.Application.IRepositories
 {
 	public interface IPromotionRepository : IGenericRepository<Promotion>
 	{
-		Task<Promotion?> GetActivePromotionByProductIdAsync(Guid productId, DateTime utcNow);
 	}
 }

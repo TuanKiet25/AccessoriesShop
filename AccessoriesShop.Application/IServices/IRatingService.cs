@@ -1,4 +1,5 @@
 ﻿using AccessoriesShop.Application.ViewModels.Requests;
+using AccessoriesShop.Application.ViewModels.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,10 @@ namespace AccessoriesShop.Application.IServices
 {
 	public interface IRatingService
 	{
-		Task CreateOrUpdateAsync(Guid accountId, CreateRatingRequest request);
-		Task<double> GetAverageAsync(Guid productId);
-		Task<int> GetTotalAsync(Guid productId);
+		Task<ServiceResult<IEnumerable<RatingResponse>>> GetAllAsync();
+		Task<ServiceResult<RatingResponse>> GetByIdAsync(Guid id);
+		Task<ServiceResult<RatingResponse>> CreateAsync(CreateRatingRequest request);
+		Task<ServiceResult<RatingResponse>> UpdateAsync(Guid id, UpdateRatingRequest request);
+		Task<ServiceResult<bool>> DeleteAsync(Guid id);
 	}
 }

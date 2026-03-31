@@ -69,8 +69,14 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
                 .ForMember(dest => dest.Files, opt => opt.Ignore());
             CreateMap<CustomOrderFile, CustomOrderFileResponse>().ReverseMap();
             CreateMap<CustomOrder, CustomOrderResponse>().ReverseMap();
-
-
-        }
+			// Rating
+			CreateMap<CreateRatingRequest, Rating>().ReverseMap();
+			CreateMap<UpdateRatingRequest, Rating>().ReverseMap();
+			CreateMap<Rating, RatingResponse>().ReverseMap();
+			// Promotion
+			CreateMap<CreatePromotionRequest, Promotion>().ReverseMap();
+			CreateMap<UpdatePromotionRequest, Promotion>().ReverseMap();
+			CreateMap<Promotion, PromotionResponse>().ReverseMap();
+		}
     }
 }
