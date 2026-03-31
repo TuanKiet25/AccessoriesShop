@@ -1,5 +1,6 @@
 ﻿using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.ViewModels.Responses;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,10 @@ namespace AccessoriesShop.Infrastructure.Services
     public class LocationService : ILocationService
     {
         private Dictionary<string, ProvinceResponse> _locations;
-        private readonly string _filePath = Path.Combine(AppContext.BaseDirectory, "Data", "tree.json");
-        public LocationService()
+        private readonly IWebHostEnvironment _env;
+        public LocationService(IWebHostEnvironment env)
         {
+            _env = env;
             LoadData();
         }
 
@@ -23,7 +25,8 @@ namespace AccessoriesShop.Infrastructure.Services
         {
             try
             {
-                var jsonString = File.ReadAllText(_filePath);
+                string filePath = Path.Combine(_env.WebRootPath, "Data", "tree.json");
+                var jsonString = File.ReadAllText(filePath);
                 _locations = JsonSerializer.Deserialize<Dictionary<string, ProvinceResponse>>(jsonString);
             }
             catch (Exception ex)

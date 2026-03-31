@@ -81,7 +81,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     await app.Services.SeedDatabaseAsync(); // Chỉ seed dữ liệu khi ở môi trường Dev
 }
-
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
