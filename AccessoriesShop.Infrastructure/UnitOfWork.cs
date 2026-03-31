@@ -23,6 +23,7 @@ namespace AccessoriesShop.Infrastructure
         public ICartItemRepository CartItems { get; }
         public ICartRepository Carts { get; }
         public ICustomOrderRepository CustomOrders { get; }
+        public IAddressRepository Addresses { get; }
 
         public UnitOfWork(
             AppDbContext context,
@@ -41,7 +42,8 @@ namespace AccessoriesShop.Infrastructure
             IPaymentRepository payments,
             ICartItemRepository cartItems,
             ICartRepository carts,
-            ICustomOrderRepository customOrders)
+            ICustomOrderRepository customOrders,
+            IAddressRepository addresses)
         {
             _context = context;
             Accounts = accounts;
@@ -60,6 +62,7 @@ namespace AccessoriesShop.Infrastructure
             CartItems = cartItems;
             Carts = carts;
             CustomOrders = customOrders;
+            Addresses = addresses;
         }
 
         public async Task<int> SaveChangesAsync()

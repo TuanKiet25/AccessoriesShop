@@ -13,6 +13,7 @@ namespace AccessoriesShop.Domain.Entities
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public decimal TotalAmount { get; set; }
         public string? Status { get; set; }
+        public string? ShippingDetail { get; set; }
         public List<OrderItem>? OrderItems { get; set; }
         public List<Payment>? Payments { get; set; }
 

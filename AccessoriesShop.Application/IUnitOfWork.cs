@@ -20,6 +20,7 @@ namespace AccessoriesShop.Application
         ICustomOrderRepository CustomOrders { get; }
         ICartItemRepository CartItems { get; }
         ICartRepository Carts { get; }
+        IAddressRepository Addresses { get; }
         Task<int> SaveChangesAsync();
     }
 }

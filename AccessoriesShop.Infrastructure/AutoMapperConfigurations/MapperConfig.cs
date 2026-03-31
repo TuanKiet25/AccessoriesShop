@@ -70,7 +70,9 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
             CreateMap<CustomOrderFile, CustomOrderFileResponse>().ReverseMap();
             CreateMap<CustomOrder, CustomOrderResponse>().ReverseMap();
 
-
+            // Address
+            CreateMap<CreateAddressRequest, Address>().ReverseMap();
+            CreateMap<Address, UserAddressResponse>().ReverseMap();
         }
     }
 }

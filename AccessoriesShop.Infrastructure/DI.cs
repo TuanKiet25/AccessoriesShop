@@ -56,6 +56,7 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICartItemRepository, CartItemRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
             #endregion
             // Đăng ký services
             #region Services
@@ -78,6 +79,8 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<IStockReservationService, StockReservationService>();
             services.AddScoped<ICartItemService, CartItemService>();
             services.AddScoped<ICustomOrderService, CustomOrderService>();
+            services.AddScoped<IAddressService, AddressService>();
+            services.AddSingleton<ILocationService, LocationService>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -96,6 +99,7 @@ namespace AccessoriesShop.Infrastructure
 
             //đăng ký HttpContextAccessor
             services.AddHttpContextAccessor();
+
             return services;
         }
     }

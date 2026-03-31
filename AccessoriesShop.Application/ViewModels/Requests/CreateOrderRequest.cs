@@ -10,6 +10,9 @@ namespace AccessoriesShop.Application.ViewModels.Requests
     public class CreateOrderRequest
     {
         public Guid AccountId { get; set; }
+        public string? ReceiverName { get; set; }  
+        public string? ReceiverPhone { get; set; }
+        public Guid AddressId { get; set; }
         public List<CreateOrderItemRequest>? OrderItems { get; set; }
     }
 }

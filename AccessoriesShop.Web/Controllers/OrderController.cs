@@ -82,9 +82,20 @@ namespace AccessoriesShop.Web.Controllers
             return HandleResult(response);
         }
         [HttpPost("Create-order-by-card-Items-id")]
-        public async Task<IActionResult> CreateOrderByCartId(List<Guid> cartItemIds)
+        public async Task<IActionResult> CreateOrderByCartId(List<Guid> cartItemIds, string? ReceiverName, string? ReceiverPhone, Guid AddressId)
         {
-            var response = await _orderService.PlaceOrderFromSelectedItemsAsync(cartItemIds);
+            var response = await _orderService.PlaceOrderFromSelectedItemsAsync(cartItemIds, ReceiverName, ReceiverPhone, AddressId);
+            return HandleResult(response);
+        }
+        [HttpPut("update-shipping-detail/{orderId}")]
+        public async Task<IActionResult> UpdateShippingDetail(Guid orderId, string? ReceiverName, string? ReceiverPhone, Guid AddressId)
+        {
+            var userId = GetUserId(User);
+            if (userId == Guid.Empty)
+            {
+                return BadRequest("User not authenticated.");
+            }
+            var response = await _orderService.UpdateShippingDetailAsync(orderId, ReceiverName, ReceiverPhone, AddressId);
             return HandleResult(response);
         }
 
