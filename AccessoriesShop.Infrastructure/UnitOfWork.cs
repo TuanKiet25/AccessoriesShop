@@ -25,6 +25,7 @@ namespace AccessoriesShop.Infrastructure
         public ICustomOrderRepository CustomOrders { get; }
         public IRatingRepository Ratings { get; }
 		public IPromotionRepository Promotions { get; }
+        public IAddressRepository Addresses { get; }
 
 		public UnitOfWork(
             AppDbContext context,
@@ -45,7 +46,8 @@ namespace AccessoriesShop.Infrastructure
             ICartRepository carts,
             ICustomOrderRepository customOrders,
 			IRatingRepository ratings,
-			IPromotionRepository promotions)
+			IPromotionRepository promotions,
+            IAddressRepository addresses)
         {
             _context = context;
             Accounts = accounts;
@@ -66,7 +68,8 @@ namespace AccessoriesShop.Infrastructure
             CustomOrders = customOrders;
 			Ratings = ratings;
 			Promotions = promotions;
-		}
+            Addresses = addresses;
+        }
 
         public async Task<int> SaveChangesAsync()
         {

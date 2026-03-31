@@ -22,6 +22,7 @@ namespace AccessoriesShop.Application
         ICartRepository Carts { get; }
 		IRatingRepository Ratings { get; }
 		IPromotionRepository Promotions { get; }
-		Task<int> SaveChangesAsync();
+        IAddressRepository Addresses { get; }
+        Task<int> SaveChangesAsync();
     }
 }

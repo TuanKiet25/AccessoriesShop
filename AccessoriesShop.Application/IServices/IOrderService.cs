@@ -15,6 +15,7 @@ namespace AccessoriesShop.Application.Interfaces.Services
         Task<ServiceResult<OrderResponse>> CreateAsync(CreateOrderRequest request);
         Task<ServiceResult<OrderResponse>> UpdateAsync(Guid id, CreateOrderRequest request);
         Task<ServiceResult<string>> DeleteAsync(Guid id);
-        Task<ServiceResult<OrderResponse>> PlaceOrderFromSelectedItemsAsync(List<Guid> cartItemIds);
+        Task<ServiceResult<OrderResponse>> PlaceOrderFromSelectedItemsAsync(List<Guid> cartItemIds, string? ReceiverName, string? ReceiverPhone, Guid AddressId);
+        Task<ServiceResult<OrderResponse>> UpdateShippingDetailAsync(Guid orderId, string? ReceiverName, string? ReceiverPhone, Guid AddressId);
     }
 }

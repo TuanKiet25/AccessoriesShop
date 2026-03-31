@@ -56,11 +56,12 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
 			services.AddScoped<IRatingRepository, RatingRepository>();
-			services.AddScoped<IPromotionRepository, PromotionRepository>();
-			#endregion
-			// Đăng ký services
-			#region Services
-			services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IPromotionRepository, PromotionRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            #endregion
+            // Đăng ký services
+            #region Services
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IJwtProvider, JwtProvider>();
@@ -81,10 +82,11 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICustomOrderService, CustomOrderService>();
 			services.AddScoped<IRatingService, RatingService>();
 			services.AddScoped<IPromotionService, PromotionService>();
-			#endregion
-			//Đăng ký auto mapper
-			services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+            services.AddScoped<IAddressService, AddressService>();
+            services.AddSingleton<ILocationService, LocationService>();
+            #endregion
+            //Đăng ký auto mapper
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             // Đăng ký CORS
             services.AddCors(options =>
             {

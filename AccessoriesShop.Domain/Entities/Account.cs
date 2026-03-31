@@ -19,5 +19,6 @@ namespace AccessoriesShop.Domain.Entities
         public List<OtpVerification>? OtpVerifications { get; set; }
         public Cart? Cart { get; set; }
 		public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
-	}
+        public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
+    }
 }

@@ -10,8 +10,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AccessoriesShop.Application.Services
@@ -23,18 +26,21 @@ namespace AccessoriesShop.Application.Services
         private readonly ILogger<OrderService> _logger;
         private readonly IStockReservationService _stockReservationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILocationService _locationService;
         public OrderService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<OrderService> logger,
             IStockReservationService stockReservationService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ILocationService locationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _stockReservationService = stockReservationService;
             _httpContextAccessor = httpContextAccessor;
+            _locationService = locationService;
         }
 
         public async Task<ServiceResult<OrderResponse>> GetByIdAsync(Guid id)
@@ -137,7 +143,31 @@ namespace AccessoriesShop.Application.Services
 
                 // Create the Order entity from the request
                 var entity = _mapper.Map<Order>(request);
-                
+                //Handle shipping detail 
+                var userAddress = await _unitOfWork.Addresses.GetAsync(ua => ua.Id == request.AddressId && ua.AccountId == request.AccountId && ua.IsDefault);
+                if (userAddress == null)
+                {
+                    return new ServiceResult<OrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = "Invalid AddressId. Address does not exist or is not default."
+                    };
+                }
+                var locationNames = _locationService.GetLocationNames(userAddress.ProvinceCode, userAddress.DistrictCode, userAddress.WardCode);
+                var snapshotAddress = new
+                {
+                    ProvinceName = locationNames.ProvinceName,
+                    DistrictName = locationNames.DistrictName,
+                    WardName = locationNames.WardName,
+                    StreetAddress = userAddress.StreetAddress,
+                    ReceiverName = string.IsNullOrWhiteSpace(request.ReceiverName)
+                   ? account.Username
+                   : request.ReceiverName,
+                    ReceiverPhone = string.IsNullOrWhiteSpace(request.ReceiverPhone)
+                    ? account.PhoneNumber
+                    : request.ReceiverPhone
+                };
+                entity.ShippingDetail = JsonSerializer.Serialize(snapshotAddress);
                 // Fetch variant details and create OrderItems with prices from database
                 entity.OrderItems = new List<OrderItem>();
                 
@@ -361,7 +391,7 @@ namespace AccessoriesShop.Application.Services
             }
         }
 
-        public async Task<ServiceResult<OrderResponse>> PlaceOrderFromSelectedItemsAsync(List<Guid> cartItemIds)
+        public async Task<ServiceResult<OrderResponse>> PlaceOrderFromSelectedItemsAsync(List<Guid> cartItemIds, string? ReceiverName, string? ReceiverPhone, Guid AddressId)
         {
             try
             {
@@ -371,7 +401,6 @@ namespace AccessoriesShop.Application.Services
                     throw new Exception("Invalid ID from token");
 
                 // 2. Lấy các CartItems dựa trên danh sách ID được chọn
-                // Phải filter thêm theo UserId để đảm bảo khách không "hack" chọn item của người khác
                 var cartItems = await _unitOfWork.CartItems.GetAllAsync(
                     filter: ci => cartItemIds.Contains(ci.Id) && ci.Cart.AccountId == userId,
                     include: q => q.Include(ci => ci.ProductVariant).Include(ci => ci.Cart)
@@ -385,7 +414,31 @@ namespace AccessoriesShop.Application.Services
                         Message = "không tồn tại sản phẩm trong giỏ hàng"
                     };
                 }
-
+                //Handle shipping detail
+                var account = await _unitOfWork.Accounts.GetByIdAsync(userId);
+                var userAddress = await _unitOfWork.Addresses.GetAsync(ua => ua.Id == AddressId && ua.AccountId == userId && ua.IsDefault);
+                if (userAddress == null)
+                {
+                    return new ServiceResult<OrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = "Invalid AddressId. Address does not exist or is not default."
+                    };
+                }
+                var locationNames = _locationService.GetLocationNames(userAddress.ProvinceCode, userAddress.DistrictCode, userAddress.WardCode);
+                var snapshotAddress = new
+                {
+                    ProvinceName = locationNames.ProvinceName,
+                    DistrictName = locationNames.DistrictName,
+                    WardName = locationNames.WardName,
+                    StreetAddress = userAddress.StreetAddress,
+                    ReceiverName = string.IsNullOrWhiteSpace(ReceiverName)
+                   ? account.Username
+                   : ReceiverName,
+                    ReceiverPhone = string.IsNullOrWhiteSpace(ReceiverPhone)
+                    ? account.PhoneNumber
+                    : ReceiverPhone
+                };
                 // 3. Khởi tạo thực thể Order
                 var order = new Order
                 {
@@ -393,7 +446,8 @@ namespace AccessoriesShop.Application.Services
                     AccountId = userId,
                     OrderDate = DateTime.UtcNow,
                     Status = OrderStatus.Pending,
-                    OrderItems = new List<OrderItem>()
+                    OrderItems = new List<OrderItem>(),
+                    ShippingDetail = JsonSerializer.Serialize(snapshotAddress)
                 };
 
                 // 4. Duyệt qua các item đã chọn để kiểm tra kho và tạo OrderItem
@@ -460,6 +514,64 @@ namespace AccessoriesShop.Application.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Error creating order: {ex.Message}");
+                return new ServiceResult<OrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ServiceResult<OrderResponse>> UpdateShippingDetailAsync(Guid orderId, string? ReceiverName, string? ReceiverPhone, Guid AddressId)
+        {
+            try
+            {
+                var order = await _unitOfWork.Orders.GetByIdAsync(orderId); 
+                if(order == null)
+                {
+                    return new ServiceResult<OrderResponse>
+                    {
+                        IsSuccess = false,
+                        IsNotFound = true,
+                        Message = ApiMessages.Order.NotFound
+                    };
+                }
+                var account = await _unitOfWork.Accounts.GetByIdAsync(order.AccountId);
+                var userAddress = await _unitOfWork.Addresses.GetAsync(ua => ua.Id == AddressId && ua.AccountId == account.Id && ua.IsDefault);
+                if (userAddress == null)
+                {
+                    return new ServiceResult<OrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = "Invalid AddressId. Address does not exist or is not default."
+                    };
+                }
+                var locationNames = _locationService.GetLocationNames(userAddress.ProvinceCode, userAddress.DistrictCode, userAddress.WardCode);
+                var snapshotAddress = new
+                {
+                    ProvinceName = locationNames.ProvinceName,
+                    DistrictName = locationNames.DistrictName,
+                    WardName = locationNames.WardName,
+                    StreetAddress = userAddress.StreetAddress,
+                    ReceiverName = string.IsNullOrWhiteSpace(ReceiverName)
+                   ? account.Username
+                   : ReceiverName,
+                    ReceiverPhone = string.IsNullOrWhiteSpace(ReceiverPhone)
+                    ? account.PhoneNumber
+                    : ReceiverPhone
+                };
+                order.ShippingDetail = JsonSerializer.Serialize(snapshotAddress);
+                await _unitOfWork.Orders.UpdateAsync(order);
+                await _unitOfWork.SaveChangesAsync();
+                return new ServiceResult<OrderResponse>
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<OrderResponse>(order),
+                    Message = "Cập nhật thông tin giao hàng thành công."
+                };
+            }
+            catch (Exception ex)
+            {
                 return new ServiceResult<OrderResponse>
                 {
                     IsSuccess = false,

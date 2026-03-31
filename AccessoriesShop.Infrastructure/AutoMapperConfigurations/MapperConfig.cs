@@ -77,6 +77,11 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
 			CreateMap<CreatePromotionRequest, Promotion>().ReverseMap();
 			CreateMap<UpdatePromotionRequest, Promotion>().ReverseMap();
 			CreateMap<Promotion, PromotionResponse>().ReverseMap();
-		}
+
+
+            // Address
+            CreateMap<CreateAddressRequest, Address>().ReverseMap();
+            CreateMap<Address, UserAddressResponse>().ReverseMap();
+        }
     }
 }

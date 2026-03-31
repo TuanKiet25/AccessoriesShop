@@ -37,6 +37,11 @@ namespace AccessoriesShop.Infrastructure.Configurations
                 .WithOne(o => o.Account)
                 .HasForeignKey(o => o.AccountId)
                 .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(a => a.Addresses)
+                .WithOne(ad => ad.Account)
+                .HasForeignKey(ad => ad.AccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }
