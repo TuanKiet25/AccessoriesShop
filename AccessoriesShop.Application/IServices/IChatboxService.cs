@@ -31,6 +31,8 @@ namespace AccessoriesShop.Application.Interfaces.Services
         /// </summary>
         /// <returns>Service status details</returns>
         Task<ServiceStatusDto> GetServiceStatusAsync();
+
+        Task<ServiceResult<IEnumerable<ChatRoomResponse>>> GetAllChatRoomAsync();
     }
 
 }

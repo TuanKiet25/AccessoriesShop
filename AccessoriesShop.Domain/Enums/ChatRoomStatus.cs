@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AccessoriesShop.Domain.Enums
 {
-    public enum Role
+    public enum ChatRoomStatus
     {
-        Admin,
-        User,
-        Staff
+        Waiting = 0,
+        HandledByStaff = 1,
+        Closed = 2
     }
 }

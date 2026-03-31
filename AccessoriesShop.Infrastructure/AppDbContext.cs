@@ -32,6 +32,8 @@ namespace AccessoriesShop.Infrastructure
         public virtual DbSet<CustomOrderFile> CustomOrderFiles { get; set; }
 		public virtual DbSet<Rating> Ratings { get; set; }
 		public virtual DbSet<Promotion> Promotions { get; set; }
+        public virtual DbSet<ChatRoom> ChatRooms { get; set; }
+        public virtual DbSet<ChatMessage> ChatMessages { get; set; }
 		#endregion
 		protected override void OnModelCreating(ModelBuilder builder)
         {

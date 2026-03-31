@@ -1,6 +1,7 @@
 ﻿using AccessoriesShop.Application.DTOs.ChatboxDto;
 using AccessoriesShop.Application.Interfaces.External;
 using AccessoriesShop.Application.Interfaces.Services;
+using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
@@ -17,17 +18,44 @@ namespace AccessoriesShop.Application.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly IAIIntegrationService _aiService;
+        private readonly IChatRoomService _chatRoomService;
         private readonly ILogger<ChatboxService> _logger;
 
         public ChatboxService(
               IAIIntegrationService aiService,
               IProductRepository productRepository,
+              IChatRoomService chatRoomService,
               ILogger<ChatboxService> logger)
         {
             _aiService = aiService;
             _productRepository = productRepository;
+            _chatRoomService = chatRoomService;
             _logger = logger;
         }
+
+        public async Task<ServiceResult<IEnumerable<ChatRoomResponse>>> GetAllChatRoomAsync()
+        {
+            try
+            {
+                var rooms = await _chatRoomService.GetActiveRoomsAsync();
+                return new ServiceResult<IEnumerable<ChatRoomResponse>>
+                {
+                    IsSuccess = true,
+                    Data = rooms,
+                    Message = "Success"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching chat rooms");
+                return new ServiceResult<IEnumerable<ChatRoomResponse>>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
         public async Task<ServiceStatusDto> GetServiceStatusAsync()
         {
             return new ServiceStatusDto

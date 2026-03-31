@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AccessoriesShop.Domain.Enums
 {
-    public enum Role
+    public enum MessageUserType
     {
-        Admin,
-        User,
-        Staff
+        Customer,
+        Staff,
+        AI
     }
 }

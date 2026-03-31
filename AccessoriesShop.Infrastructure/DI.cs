@@ -3,6 +3,7 @@ using AccessoriesShop.Application.Authentication;
 using AccessoriesShop.Application.Common.Settings;
 using AccessoriesShop.Application.Interfaces.External;
 using AccessoriesShop.Application.Interfaces.Services;
+using AccessoriesShop.Application.IRepositories;
 using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.Repositories;
 using AccessoriesShop.Application.Services;
@@ -57,6 +58,8 @@ namespace AccessoriesShop.Infrastructure
             services.AddScoped<ICustomOrderRepository, CustomOrderRepository>();
 			services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddScoped<IPromotionRepository, PromotionRepository>();
+            services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+            services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             #endregion
             // Đăng ký services
@@ -84,6 +87,7 @@ namespace AccessoriesShop.Infrastructure
 			services.AddScoped<IPromotionService, PromotionService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddSingleton<ILocationService, LocationService>();
+            services.AddScoped<IChatRoomService, ChatRoomService>();
             #endregion
             //Đăng ký auto mapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

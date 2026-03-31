@@ -1,4 +1,5 @@
 ﻿using AccessoriesShop.Application.Interfaces.Services;
+using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
 using AccessoriesShop.Domain.Constants;
@@ -7,15 +8,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace AccessoriesShop.Application.Services
 {

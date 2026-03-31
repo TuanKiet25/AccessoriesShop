@@ -1,6 +1,7 @@
 using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.ViewModels.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.NetworkInformation;
 
 namespace AccessoriesShop.Web.Controllers
 {
@@ -26,5 +27,7 @@ namespace AccessoriesShop.Web.Controllers
             var status = await _chatboxService.GetServiceStatusAsync();
             return Ok(status);
         }
+
+
     }
 }

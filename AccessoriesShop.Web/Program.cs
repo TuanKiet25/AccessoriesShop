@@ -1,5 +1,6 @@
 ﻿using AccessoriesShop.Infrastructure;
 using AccessoriesShop.Infrastructure.Seeding;
+using AccessoriesShop.Web.Hubs;
 using IdGen;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -58,7 +59,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
         };
+
+        // Allow JWT via query string for SignalR WebSocket connections
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
+
+// Add SignalR
+builder.Services.AddSignalR();
 //COVERT ENUM TO STRING IN JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -89,5 +108,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map SignalR Hub
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();
