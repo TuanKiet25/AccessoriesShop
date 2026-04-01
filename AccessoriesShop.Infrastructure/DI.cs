@@ -102,7 +102,8 @@ namespace AccessoriesShop.Infrastructure
                                       policy.WithOrigins(
                                                     "http://localhost:8080",
                                                     "http://localhost:3000",
-                                                    "https://accessoriesshop.onrender.com"
+                                                    "https://accessoriesshop.onrender.com",
+                                                    "https://fusion-tech-zone.lovable.app"
                                                         )
                                             .AllowCredentials()
                                             .AllowAnyHeader()

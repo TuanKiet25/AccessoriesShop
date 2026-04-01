@@ -98,7 +98,12 @@ namespace AccessoriesShop.Web.Controllers
             var response = await _orderService.UpdateShippingDetailAsync(orderId, ReceiverName, ReceiverPhone, AddressId);
             return HandleResult(response);
         }
-
+        [HttpGet("get-order-by-user-id")]
+        public async Task<IActionResult> GetOrderByUserId()
+        {
+            var response = await _orderService.GetOrderByUserId();
+            return HandleResult(response);
+        }
         // Helper method to extract user id from ClaimsPrincipal
         private Guid GetUserId(ClaimsPrincipal user)
         {
