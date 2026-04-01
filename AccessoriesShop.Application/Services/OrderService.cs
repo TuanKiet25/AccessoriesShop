@@ -1,4 +1,4 @@
-﻿using AccessoriesShop.Application.Interfaces.Services;
+using AccessoriesShop.Application.Interfaces.Services;
 using AccessoriesShop.Application.IServices;
 using AccessoriesShop.Application.ViewModels.Requests;
 using AccessoriesShop.Application.ViewModels.Responses;
@@ -188,13 +188,30 @@ namespace AccessoriesShop.Application.Services
                         };
                     }
 
-                    // Create OrderItem with price fetched from variant
+                    // Apply promotion if active
+                    decimal finalPrice = variant.Price;
+                    var promotions = await _unitOfWork.Promotions.GetAllAsync(p => p.ProductId == variant.ProductId && p.IsActive && p.StartDate <= DateTime.UtcNow && p.EndDate >= DateTime.UtcNow);
+                    if (promotions != null && promotions.Any())
+                    {
+                        var bestPromotion = promotions.OrderByDescending(p => p.IsPercentage ? (variant.Price * p.DiscountValue / 100) : p.DiscountValue).First();
+                        if (bestPromotion.IsPercentage)
+                        {
+                            finalPrice = finalPrice - (finalPrice * bestPromotion.DiscountValue / 100);
+                        }
+                        else
+                        {
+                            finalPrice = finalPrice - bestPromotion.DiscountValue;
+                        }
+                        if (finalPrice < 0) finalPrice = 0;
+                    }
+
+                    // Create OrderItem with price fetched from variant and apply discount
                     var orderItem = new OrderItem
                     {
                         OrderId = entity.Id,
                         VariantId = itemRequest.VariantId,
                         Quantity = itemRequest.Quantity,
-                        Price = variant.Price  // Get price from database
+                        Price = finalPrice  // Get price from database + apply discount
                     };
 
                     entity.OrderItems.Add(orderItem);
@@ -307,13 +324,30 @@ namespace AccessoriesShop.Application.Services
                             };
                         }
 
-                        // Create OrderItem with price fetched from variant
+                        // Apply promotion if active
+                        decimal finalPrice = variant.Price;
+                        var promotions = await _unitOfWork.Promotions.GetAllAsync(p => p.ProductId == variant.ProductId && p.IsActive && p.StartDate <= DateTime.UtcNow && p.EndDate >= DateTime.UtcNow);
+                        if (promotions != null && promotions.Any())
+                        {
+                            var bestPromotion = promotions.OrderByDescending(p => p.IsPercentage ? (variant.Price * p.DiscountValue / 100) : p.DiscountValue).First();
+                            if (bestPromotion.IsPercentage)
+                            {
+                                finalPrice = finalPrice - (finalPrice * bestPromotion.DiscountValue / 100);
+                            }
+                            else
+                            {
+                                finalPrice = finalPrice - bestPromotion.DiscountValue;
+                            }
+                            if (finalPrice < 0) finalPrice = 0;
+                        }
+
+                        // Create OrderItem with price fetched from variant and apply discount
                         var orderItem = new OrderItem
                         {
                             OrderId = entity.Id,
                             VariantId = itemRequest.VariantId,
                             Quantity = itemRequest.Quantity,
-                            Price = variant.Price  // Get price from database
+                            Price = finalPrice  // Get price from database + apply discount
                         };
 
                         entity.OrderItems.Add(orderItem);
@@ -458,12 +492,29 @@ namespace AccessoriesShop.Application.Services
                         };
                     }
 
+                    // Apply promotion if active
+                    decimal finalPrice = variant.Price;
+                    var promotions = await _unitOfWork.Promotions.GetAllAsync(p => p.ProductId == variant.ProductId && p.IsActive && p.StartDate <= DateTime.UtcNow && p.EndDate >= DateTime.UtcNow);
+                    if (promotions != null && promotions.Any())
+                    {
+                        var bestPromotion = promotions.OrderByDescending(p => p.IsPercentage ? (variant.Price * p.DiscountValue / 100) : p.DiscountValue).First();
+                        if (bestPromotion.IsPercentage)
+                        {
+                            finalPrice = finalPrice - (finalPrice * bestPromotion.DiscountValue / 100);
+                        }
+                        else
+                        {
+                            finalPrice = finalPrice - bestPromotion.DiscountValue;
+                        }
+                        if (finalPrice < 0) finalPrice = 0;
+                    }
+
                     order.OrderItems.Add(new OrderItem
                     {
                         OrderId = order.Id,
                         VariantId = cartItem.ProductVariantId,
                         Quantity = cartItem.Quantity,
-                        Price = variant.Price // Chốt giá tại thời điểm mua
+                        Price = finalPrice // Chốt giá tại thời điểm mua sau khi áp dụng mã giảm giá
                     });
                 }
 
