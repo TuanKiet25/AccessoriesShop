@@ -323,6 +323,7 @@ namespace AccessoriesShop.Application.Services
                 return new ServiceResult<string>
                 {
                     IsSuccess = true,
+                    Data = $"Account's OTP code :{otpCode}",
                     Message = "Register successfully! Please check your email for the OTP to verify your account."
                 };
             }
