@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 
 namespace AccessoriesShop.Application.Services
@@ -55,7 +56,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(entity);
                 if (entity.OrderItems != null && entity.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
                 }
 
                 return new ServiceResult<OrderResponse> 
@@ -88,7 +89,7 @@ namespace AccessoriesShop.Application.Services
                     var response = _mapper.Map<OrderResponse>(entity);
                     if (entity.OrderItems != null && entity.OrderItems.Count > 0)
                     {
-                        response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                        response.OrderItems = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
                     }
                     responseList.Add(response);
                 }
@@ -251,7 +252,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(createdOrder);
                 if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
                 }
 
                 return new ServiceResult<OrderResponse>
@@ -363,7 +364,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(entity);
                 if (entity.OrderItems != null && entity.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
                 }
 
                 return new ServiceResult<OrderResponse>
@@ -546,7 +547,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(createdOrder);
                 if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
 
                 }
                 return new ServiceResult<OrderResponse>
@@ -618,6 +619,31 @@ namespace AccessoriesShop.Application.Services
             catch (Exception ex)
             {
                 return new ServiceResult<OrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }    
+        }
+        public async Task<ServiceResult<List<OrderResponse>>> GetOrderByUserId()
+        {
+            try
+            {
+                var userIdString = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+                    throw new Exception("Invalid ID from token");
+                var orders = await _unitOfWork.Orders.GetAllAsync(filter: o => o.AccountId == userId, include: q => q.Include(o => o.OrderItems));
+                var results = _mapper.Map<List<OrderResponse>>(orders);
+                return new ServiceResult<List<OrderResponse>>
+                {
+                    IsSuccess = true,
+                    Data = results,
+                    Message = "Lấy danh sách đơn hàng của người dùng thành công."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<List<OrderResponse>>
                 {
                     IsSuccess = false,
                     Message = ex.Message
