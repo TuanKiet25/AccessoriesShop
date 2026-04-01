@@ -66,7 +66,8 @@ namespace AccessoriesShop.Infrastructure.AutoMapperConfigurations
             CreateMap<Cart, CartResponse>().ReverseMap();
             // Custom Order
             CreateMap<CreateCustomOrderRequest, CustomOrder>()
-                .ForMember(dest => dest.Files, opt => opt.Ignore());
+                .ForMember(dest => dest.ProductBaseId, opt => opt.Ignore())
+                .ForMember(dest => dest.Files, opt => opt.Ignore()).ReverseMap();
             CreateMap<CustomOrderFile, CustomOrderFileResponse>().ReverseMap();
             CreateMap<CustomOrder, CustomOrderResponse>().ReverseMap();
 			// Rating

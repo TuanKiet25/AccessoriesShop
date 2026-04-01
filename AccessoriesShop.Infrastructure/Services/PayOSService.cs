@@ -51,7 +51,6 @@ namespace AccessoriesShop.Infrastructure.Services
         {
             try
             {
-                // Validate order exists
                 var order = await _unitOfWork.Orders.GetByIdAsync(request.OrderId);
                 if (order == null)
                 {
@@ -63,13 +62,10 @@ namespace AccessoriesShop.Infrastructure.Services
                     };
                 }
 
-                // Generate unique orderCode (PayOS requires numeric long)
-                // Limit to 8 characters for better readability
                 long refCode = _idGenerator.CreateId();
                 string refCodeString = Math.Abs(refCode % 100000000).ToString().PadLeft(8, '0');
 
 
-                // Create payment record
                 var payment = new Payment
                 {
                     Currency = "VND",
@@ -104,7 +100,7 @@ namespace AccessoriesShop.Infrastructure.Services
                 // 5. Update payment with URL
                 payment.PaymentUrl = createPaymentResult.CheckoutUrl;
 
-                _logger.LogInformation(
+                _logger.LogInformation( 
                     "PayOS payment link created: PaymentId={PaymentId}, OrderCode={OrderCode}",
                     payment.Id, refCodeString);
 

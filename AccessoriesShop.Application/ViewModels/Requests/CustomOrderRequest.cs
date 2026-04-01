@@ -3,7 +3,7 @@ namespace AccessoriesShop.Application.ViewModels.Requests
     public class CreateCustomOrderRequest
     {
         public Guid? AccountId { get; set; }
-        public Guid? ProductBaseId { get; set; }
+        public Guid? VariantId { get; set; }
         public string? Color { get; set; }
         public string? Material { get; set; }
         public string? TextContent { get; set; }

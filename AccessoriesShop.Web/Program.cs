@@ -93,10 +93,10 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate();
-         if (app.Environment.IsDevelopment())
-         {
-        await services.SeedDatabaseAsync();
-         }
+        if (app.Environment.IsDevelopment())
+        {
+            await services.SeedDatabaseAsync();
+        }
     }
     catch (Exception ex)
     {
@@ -117,7 +117,7 @@ app.UseCors("AllowAll");
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
-    
+
     options.RoutePrefix = string.Empty;
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 });

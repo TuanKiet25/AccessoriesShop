@@ -25,18 +25,21 @@ namespace AccessoriesShop.Application.Services
             try
             {
                 var entity = _mapper.Map<CustomOrder>(request);
-                if (request.ProductBaseId.HasValue)
+                if (request.VariantId.HasValue)
                 {
-                    var product = await _unitOfWork.Products.GetByIdAsync(request.ProductBaseId.Value);
-                    if (product == null)
+                    var variant = await _unitOfWork.ProductVariants.GetByIdAsync(request.VariantId.Value);
+                    if (variant == null)
                     {
                         return new ServiceResult<CustomOrderResponse>
                         {
                             IsSuccess = false,
-                            Message = "Invalid base product id."
+                            Message = "Invalid variant id."
                         };
                     }
-                    entity.EstimatedPrice = product.Price * request.Quantity;
+
+                    // ProductBaseId must reference Products table, not ProductVariants.
+                    entity.ProductBaseId = variant.ProductId;
+                    entity.EstimatedPrice = variant.Price * request.Quantity;
                 }
                 if (request.ImageUrls != null && request.ImageUrls.Any())
                 {
