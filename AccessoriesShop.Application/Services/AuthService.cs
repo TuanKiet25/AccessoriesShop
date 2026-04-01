@@ -266,6 +266,76 @@ namespace AccessoriesShop.Application.Services
             }
         }
 
+        public async Task<ServiceResult<string>> RegisterWithRoleAsync(RegisterWithRoleRequest request)
+        {
+            try
+            {
+                var existingUser = await _unitOfWork.Accounts
+                    .GetAsync(a => a.Email == request.Email && a.IsActive == true);
+
+                if (existingUser != null)
+                {
+                    return new ServiceResult<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Email is already registered."
+                    };
+                }
+
+                // Validate role
+                if (!System.Enum.TryParse(typeof(Domain.Enums.Role), request.Role, true, out var roleEnum))
+                {
+                    return new ServiceResult<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Invalid role. Valid roles are: Admin, User, Staff."
+                    };
+                }
+
+                var account = new Account
+                {
+                    Username = request.Username,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    PasswordHash = _passwordHasher.Hash(request.PasswordHash),
+                    Role = (Domain.Enums.Role)roleEnum,
+                    IsActive = false
+                };
+
+                await _unitOfWork.Accounts.AddAsync(account);
+
+                var otpCode = GenerateOtpCode();
+
+                var otp = new OtpVerification
+                {
+                    AccountId = account.Id,
+                    OtpCode = otpCode,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(20),
+                    IsUsed = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _unitOfWork.OtpVerifications.AddAsync(otp);
+                await _unitOfWork.SaveChangesAsync();
+
+                await _emailService.SendOtpEmailAsync(account.Email, account.Username, otpCode);
+
+                return new ServiceResult<string>
+                {
+                    IsSuccess = true,
+                    Message = "Register successfully! Please check your email for the OTP to verify your account."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<string>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
         private static string GenerateOtpCode()
         {
             var random = new Random();

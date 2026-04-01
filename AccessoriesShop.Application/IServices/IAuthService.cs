@@ -11,6 +11,7 @@ namespace AccessoriesShop.Application.Interfaces.Services
     public interface IAuthService
     {
         public Task<ServiceResult<string>> RegisterAsync(RegisterRequest request);
+        public Task<ServiceResult<string>> RegisterWithRoleAsync(RegisterWithRoleRequest request);
         public Task<ServiceResult<LoginResponse>> LoginAsync(LoginRequest request);
         public Task<ServiceResult<string>> VerifyOtpAsync(VerifyOtpRequest request);
         public Task<ServiceResult<string>> ResendOtpAsync(ResendOtpRequest request);

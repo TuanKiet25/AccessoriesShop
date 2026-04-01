@@ -13,17 +13,18 @@ namespace AccessoriesShop.Infrastructure.Configurations
 	{
 		public void Configure(EntityTypeBuilder<Promotion> builder)
 		{
-			builder.ToTable("Promotions", t =>
-			{
-				t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" > 0");
-				t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
-				t.HasCheckConstraint(
-					"CK_Promotions_PercentageRange",
-					"\"IsPercentage\" = FALSE OR (\"DiscountValue\" >= 0 AND \"DiscountValue\" <= 100)"
-				);
-			});
+            builder.ToTable("Promotions", t =>
+            {
+                // Phải có dấu ngoặc kép và viết hoa đúng như tên thuộc tính C#
+                t.HasCheckConstraint("CK_Promotions_DiscountValue", "\"DiscountValue\" > 0");
+                t.HasCheckConstraint("CK_Promotions_DateRange", "\"EndDate\" >= \"StartDate\"");
+                t.HasCheckConstraint(
+                    "CK_Promotions_PercentageRange",
+                    "\"IsPercentage\" = FALSE OR (\"DiscountValue\" >= 0 AND \"DiscountValue\" <= 100)"
+                );
+            });
 
-			builder.HasKey(x => x.Id);
+            builder.HasKey(x => x.Id);
 
 			builder.Property(x => x.ProductId)
 				.IsRequired();
