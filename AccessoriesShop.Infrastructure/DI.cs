@@ -104,7 +104,6 @@ namespace AccessoriesShop.Infrastructure
                                                     "http://localhost:3000",
                                                     "https://accessoriesshop.onrender.com"
                                                         )
-                                            .AllowAnyOrigin()
                                             .AllowAnyHeader()
                                             .AllowAnyMethod();
                                   });
