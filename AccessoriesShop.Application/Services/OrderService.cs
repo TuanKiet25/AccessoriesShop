@@ -56,7 +56,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(entity);
                 if (entity.OrderItems != null && entity.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
                 }
 
                 return new ServiceResult<OrderResponse> 
@@ -89,7 +89,7 @@ namespace AccessoriesShop.Application.Services
                     var response = _mapper.Map<OrderResponse>(entity);
                     if (entity.OrderItems != null && entity.OrderItems.Count > 0)
                     {
-                        response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                        response.OrderItems = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
                     }
                     responseList.Add(response);
                 }
@@ -235,7 +235,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(createdOrder);
                 if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
                 }
 
                 return new ServiceResult<OrderResponse>
@@ -330,7 +330,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(entity);
                 if (entity.OrderItems != null && entity.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(entity.OrderItems);
                 }
 
                 return new ServiceResult<OrderResponse>
@@ -496,7 +496,7 @@ namespace AccessoriesShop.Application.Services
                 var response = _mapper.Map<OrderResponse>(createdOrder);
                 if (createdOrder.OrderItems != null && createdOrder.OrderItems.Count > 0)
                 {
-                    response.Items = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
+                    response.OrderItems = _mapper.Map<List<OrderItemResponse>>(createdOrder.OrderItems);
 
                 }
                 return new ServiceResult<OrderResponse>
