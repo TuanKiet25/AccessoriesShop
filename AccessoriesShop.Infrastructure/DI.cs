@@ -97,8 +97,14 @@ namespace AccessoriesShop.Infrastructure
                 options.AddPolicy("AllowAll",
                                   policy =>
                                   {
+
                                       // Cho phép origin của frontend được truy cập
-                                      policy.AllowAnyOrigin()
+                                      policy.WithOrigins(
+                                                    "http://localhost:8080",
+                                                    "http://localhost:3000",
+                                                    "https://accessoriesshop.onrender.com"
+                                                        )
+                                            .AllowAnyOrigin()
                                             .AllowAnyHeader()
                                             .AllowAnyMethod();
                                   });

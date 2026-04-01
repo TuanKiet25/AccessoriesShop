@@ -46,21 +46,6 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-builder.Services.AddCors(options =>         
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy
-            .WithOrigins(
-                "http://localhost:8080",
-                "http://localhost:3000",
-                "https://accessoriesshop.onrender.com"
-            )
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-    });
-});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
