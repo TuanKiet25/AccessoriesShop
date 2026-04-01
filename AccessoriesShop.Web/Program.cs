@@ -46,6 +46,21 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+builder.Services.AddCors(options =>         
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:8080",
+                "http://localhost:3000",
+                "https://accessoriesshop.onrender.com"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -113,7 +128,7 @@ app.Use(async (context, next) =>
 });
 
 // Configure the HTTP request pipeline.
-
+app.UseCors("AllowAll");
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -125,14 +140,12 @@ app.UseSwaggerUI(options =>
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
 
 // Map SignalR Hub
 app.MapHub<ChatHub>("/hubs/chat");
+app.MapControllers();
 
 app.Run();
