@@ -116,6 +116,7 @@ namespace AccessoriesShop.Application.Services
             try
             {
                 var entity = _mapper.Map<Address>(request);
+                entity.IsDefault = true;
                 await _unitOfWork.Addresses.AddAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
                 var locationNames = _locationService.GetLocationNames(entity.ProvinceCode, entity.DistrictCode, entity.WardCode);
